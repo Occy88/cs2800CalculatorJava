@@ -70,7 +70,7 @@ public class Stack {
 	 * prints all current entries in {@linkplain #entries}
 	 */
 	public void print()  {
-		System.out.println(" ");
+		
 		for (int i=this.size-1;i>=0;i--)
 		{
 			System.out.print("["+this.entries.get(i).toString()+"]");

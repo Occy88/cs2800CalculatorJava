@@ -68,7 +68,6 @@ public class Entry {
 		this.type=Type.SYMBOL;
 	}
 	public Entry(Function function) {
-		System.out.println("Created Entry Function: "+function.toString());
 		this.function=function;
 		this.type=Type.FUNCTION;
 	}
@@ -130,7 +129,6 @@ public class Entry {
 	
 	}
 	public Function getFunction() throws BadTypeException {
-		System.out.println("Getting");
 		if(type!=Type.FUNCTION) {
 			throw new BadTypeException(Type.FUNCTION,type);
 		}

@@ -110,7 +110,7 @@ class TokenStackTest {
 	}
 	/**
 	 * function detects if string is float
-	 * and pushes if it is.
+	 * 
 	 * @throws EmptyStackException 
 	 * @throws BadTypeException 
 	 * @returns boolean
@@ -119,16 +119,14 @@ class TokenStackTest {
 	void testStringForFloat() throws BadTypeException, EmptyStackException {
 		TokenStack tokenStack=new TokenStack();
 		
-		boolean hasPushed=tokenStack.testFloat("string1");
-		assertEquals(tokenStack.size(),0,"string 'string1' pushed when testing for float");
-		assertFalse(hasPushed,"returned should be false if string not a float");
+		boolean isFloat=tokenStack.testFloat("string1");
+		assertFalse(isFloat,"returned should be false if string not a float");
 		
-		hasPushed=tokenStack.testFloat("1");
-		assertEquals(tokenStack.pop().getValue(),(float)1,"string '1' pushed not converted to float or not pushed");
-		assertTrue(hasPushed,"returned should be true if string is a float");	
+		isFloat=tokenStack.testFloat("1");
+		assertTrue(isFloat,"returned should be true if string is a float");	
 	}
 	/**
-	 * function detects if string is a symbol from Symbol class and pushes it to the stack
+	 * function detects if string is a symbol from Symbol class
 	 * @throws EmptyStackException 
 	 * @throws BadTypeException 
 	 */
@@ -136,57 +134,96 @@ class TokenStackTest {
 	void testStringForSymbol() throws BadTypeException, EmptyStackException {
 		TokenStack tokenStack=new TokenStack();
 		
-		boolean hasPushed=tokenStack.testSymbol("string1");
-		assertEquals(tokenStack.size(),0,"string 'string1' pushed when testing for symbol");
-		assertFalse(hasPushed,"returned should be false if string not a symbol");
+		boolean isSymbol=tokenStack.testSymbol("string1");
+		assertFalse(isSymbol,"returned should be false if string not a symbol");
 		
-		hasPushed=tokenStack.testSymbol("(");
-		assertEquals(tokenStack.pop().getSymbol(),Symbol.LEFT_BRACKET,"string '(' not pushed when testing for symbol");
-		assertTrue(hasPushed,"returned should be true if string is a symbol");
-		
-		hasPushed=tokenStack.testSymbol(")");
-		assertEquals(tokenStack.pop().getSymbol(),Symbol.RIGHT_BRACKET,"string ')' not pushed when testing for symbol");
-	
-		hasPushed=tokenStack.testSymbol("*");
-		assertEquals(tokenStack.pop().getSymbol(),Symbol.TIMES,"string '*' not pushed when testing for symbol");
-	
-		hasPushed=tokenStack.testSymbol("/");
-		assertEquals(tokenStack.pop().getSymbol(),Symbol.DIVIDE,"string '/' not pushed when testing for symbol");
-	
-		hasPushed=tokenStack.testSymbol("+");
-		assertEquals(tokenStack.pop().getSymbol(),Symbol.PLUS,"string '+' not pushed when testing for symbol");
-	
-		hasPushed=tokenStack.testSymbol("-");
-		assertEquals(tokenStack.pop().getSymbol(),Symbol.MINUS,"string '' not pushed when testing for symbol");
+		isSymbol=tokenStack.testSymbol("(");
+		assertTrue(isSymbol,"returned should be true if string is a symbol");
 	}
 	/**
-	 * function that checks for parses expression, checks for float
-	 * checks for symbol, pushes to stack, and throws if input is invalid;
-	 * 
+	 * function detects if string is a Function from {@linkplain Function} class
+	 * @throws EmptyStackException 
+	 * @throws BadTypeException 
 	 */
 	@Test
-	void pushExpressionToStackFromString()  {
+	void testStringForFunction() throws BadTypeException, EmptyStackException {
 		TokenStack tokenStack=new TokenStack();
-		String expression1="string";
-		String expression2="1 2 + - / ( )"; // 7 valid variables
+		
+		boolean isFunction=tokenStack.testFunction("string1");
+		assertFalse(isFunction,"returned should be false if string not a symbol");
+		
+		isFunction=tokenStack.testFunction("pow");
+		assertTrue(isFunction,"returned should be true if string is a symbol");
+	}
+// this test has now been replaced with a function to push any string rather than one of a specific format.
+//	/**
+//	 * function that checks for parses expression, checks for float
+//	 * checks for symbol, pushes to stack, and throws if input is invalid;
+//	 * 
+//	 */
+//	@Test
+//	void pushExpressionToStackFromString()  {
+//		TokenStack tokenStack=new TokenStack();
+//		String expression1="string";
+//		String expression2="1 2 + - / ( )"; // 7 valid variables
+//		
+//		try {
+//			tokenStack.pushExpression(expression1);
+//			System.out.println(tokenStack.size());
+//			fail("expected following expression to be thrown: "+expression1);
+//		}catch (InvalidExpression ex) {};
+//		
+//		try {
+//			tokenStack.pushExpression(expression2);
+//			
+//			assertEquals(tokenStack.size(),7,"expected 7 variables to be pushed in the following expression: "+expression2);
+//		}catch (InvalidExpression ex) {
+//			System.out.println(ex.getMessage());
+//			fail("expected following expression to be pushed:"+expression2);
+//		};
+//	}
+	// now assume expression is entered in any form:
+	/**
+	 * Test
+	 * this test is to convert an entered string into a standard form, no caps no spaces
+	 */
+	@Test
+	void convertStringNoCapsNoSpaces() {
+		TokenStack tokenStack=new TokenStack();
+		String converted=tokenStack.formatString("Test s T R i n g");
+		assertEquals(converted,"teststring","not converted correctly");
+	}
+ 
+	/**
+	 * this test takes any string that represents a standard expression and decides if entered variables are legal or not
+	 * and pushes them onto the stack.
+	 * then pushes it
+	 */
+	@Test
+	void pushAnyPostfixExpressionToStackFromString() {
+		TokenStack tokenStack=new TokenStack();
+		String expression1="7 * Pokw( 3/2 , 6 )"; //invalid expression
+		String expression2="7 * Pow( 3/2 ,6 )"; // 9 valid variables, "," represents break and is not pushed
 		
 		try {
-			tokenStack.pushExpression(expression1);
-			System.out.println(tokenStack.size());
+			tokenStack.pushUnformatedExpression(expression1);
+			tokenStack.print();
 			fail("expected following expression to be thrown: "+expression1);
 		}catch (InvalidExpression ex) {};
-		
+		tokenStack=new TokenStack();
 		try {
-			tokenStack.pushExpression(expression2);
-			
-			assertEquals(tokenStack.size(),7,"expected 7 variables to be pushed in the following expression: "+expression2);
+			tokenStack.pushUnformatedExpression(expression2);
+			tokenStack.print();
+			assertEquals(tokenStack.size(),9,"expected 9 variables to be pushed in the following expression: "+expression2);
 		}catch (InvalidExpression ex) {
 			System.out.println(ex.getMessage());
 			fail("expected following expression to be pushed:"+expression2);
 		};
-		
-		
 	}
+		
+		
+		
+	
 
 }
 

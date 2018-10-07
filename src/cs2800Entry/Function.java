@@ -150,7 +150,6 @@ public enum Function {
 		case IEEEREMAINDER:
 			return 2;
 		case POW:
-			System.out.println("retured 2");
 			return 2;
 		default: throw new BadSymbolException(function.toString());
 

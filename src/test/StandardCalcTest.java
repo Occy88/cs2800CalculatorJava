@@ -24,26 +24,16 @@ class StandardCalcTest {
 
 	@Test
 	void testAlgorithm() throws InvalidExpression, EmptyStackException {
-		TokenStack tokenQueue=new TokenStack();
-		tokenQueue.pushExpression("( 5 / 4 ) * sqrt 2  ");
-		
-		float result=calc.shuntingAlgorithm(tokenQueue);
+		String expression="(5*2)/pow(4,2)";
+		TokenStack tokenStack=new TokenStack();
+		tokenStack.pushUnformatedExpression(expression);
+		float result=calc.shuntingAlgorithm(tokenStack);
+		assertEquals((float)0.625,result,"Result from algoritm is unexpected.");
 		System.out.println("FINAL RESULT:"+Float.toString(result));
 		
 	}
+
 	
-	/*
-	 * for each token in the postfix expression:
-		  if token is an operator:
-		    operand_2 ← pop from the stack
-		    operand_1 ← pop from the stack
-		    result ← evaluate token with operand_1 and operand_2
-		    push result back onto the stack
-		  else if token is an operand:
-		    push token onto the stack
-		result ← pop from the stack
-	 */
-		
 	
 	
 

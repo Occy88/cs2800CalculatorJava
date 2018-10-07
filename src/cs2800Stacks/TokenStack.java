@@ -124,7 +124,7 @@ public class TokenStack {
 	public boolean testFloat(String string) {
         try
         { 
-            push(Float.parseFloat(string));
+        	Float.parseFloat(string);
             return  true;
             
         }  
@@ -135,18 +135,13 @@ public class TokenStack {
 		
 	}
 	/**
-	 * tests if a given string is a {@linkplain Function} <br>
-	 * if true pushes onto {@linkplain #tokenStack}
+	 * tests if a given string is a {@linkplain Function}
 	 * @param string
 	 * @return boolean
 	 */
 	public boolean testFunction(String string) {
 		try {
-			Function function=Function.stringToFunction(string);
-			Entry entry = new Entry(function);
-			this.tokenStack.push(entry);
-			
-			
+			Function.stringToFunction(string);
 			return true;
 		} catch (BadSymbolException e) {
 			return false;
@@ -154,16 +149,12 @@ public class TokenStack {
 	}
 	/**
 	 * tests if a given string is a {@linkplain Symbol} <br>
-	 * if true pushes onto {@linkplain #tokenStack} returns true <br>
-	 * else returns false
 	 * @param string
 	 * @return boolean
 	 */
 	public boolean testSymbol(String string) {
 		try {
-			Symbol symbol = Symbol.stringToSymbol(string);
-			Entry entry=new Entry(symbol);
-			this.tokenStack.push(entry);
+			Symbol.stringToSymbol(string);
 			return true;
 		}catch (BadSymbolException e) {
 			return false;
@@ -171,31 +162,40 @@ public class TokenStack {
 	}
 
 	/**
-	 * Pushes a String expression onto the stack <br>
-	 * uses:<br> {@linkplain #parse(String)}<br>
-	 * {@linkplain #testFloat(String)},{@linkplain #testFunction(String)},{@linkplain #testSymbol(String)}<br>
-	 * string is parsed tested for valid entries and pushed onto stack
+	 * attempt at pushing String input onto the stack <br>
 	 * 
-	 * @param expression
+	 * @param input String
 	 * @throws InvalidExpression
 	 */
-	public  void pushExpression(String expression)throws InvalidExpression {
-		String[] variables= parse(expression);
+	public  void pushString(String input)throws InvalidExpression {			
+		boolean passed= false;
 		
-		for(int i=variables.length-1;i>=0;i--) {
-			String variable=variables[i];
-			
-			if (!(testFloat(variable) || testSymbol(variable)||testFunction(variable))){
-			
-				throw new InvalidExpression(variable);
-			}		
-			
-		}
+		try {
+			this.push(Float.parseFloat(input));
+			passed=true;
+		}catch (NumberFormatException e) { } 
 		
-		// TODO Auto-generated method stub
+		try {
+			this.push(Symbol.stringToSymbol(input));
+			passed=true;
+		} catch (BadSymbolException e) {}
 		
+		try {
+			this.push(Function.stringToFunction(input));
+			passed=true;
+		} catch (BadSymbolException e) {}	
+	
+		if (!passed) {throw new InvalidExpression(input);}
+		
+	}	
+	/**
+	 * tests validity of string as a {@linkplain Float}, {@linkplain Symbol} or {@linkplain Function}
+	 * @param input
+	 * @return
+	 */
+	public boolean checkValidityString(String input) {
+		return(testFloat(input) || testSymbol(input)||testFunction(input));
 	}
-
 	/**
 	 * does not remove top entry in stack
 	 * @return top entry in {@linkplain #tokenStack}
@@ -216,7 +216,137 @@ public class TokenStack {
 		
 	}
 
+	/**
+	 * formats string to lower case and no spaces
+	 * @param string
+	 * @return string
+	 */
+	public String formatString(String string) {
+		string=string.toLowerCase();
+		string=string.replaceAll(" ", "");
+		return string;
+	}
 
+	/**
+	 * 
+	 * @param expression
+	 * @throws InvalidExpression
+	 */
+	/*
+	 * Pseudo code for this function:
+	 * input expression --> Pow 5,4 +
+	 * format expression--> pow5,4+
+	 * convert to char array -->[p] [o] ...
+	 * push each value onto string stack:
+	 * two stacks:
+	 * queue stack containing characters of expression in reverse i.e top of stack=start of expression
+	 * output stack containing the expression to be pushed as a string
+	 * in this function char arrays will be used instead of stacks to facilitate to string conversion given by java
+	 * 
+	 * check() function, tests if a string can be pushed to expression
+	 * boolean isValid = false
+	 * while input stack is not empty:
+	 * 		char input=(inputStack.pop()
+	 * 		if input == ","
+	 * 			if isValid:
+	 * 				push(outputStack)
+	 * 				outputStack.clear()
+	 * 				isValid=False
+	 * 				continue;
+	 * 			else
+	 * 				throw invalid expression
+	 * 		outputStack.push(input)
+	 * 		if check(outputStack.toString()):
+	 * 			isValid=true
+	 * 		else:
+	 * 			if isValid:
+	 * 				inputStack.push(outputStack.pop())
+	 * 				push(outputStack)
+	 * 				outputStack.clear()
+	 * 				isValid=false
+	 * 				continue;
+	 * 			else:
+	 * 				throw invalid expression
+	 * if isValid:
+	 * 		push(outputStack)
+	 * else:
+	 * 		throw invalid expression.
+	 * 		
+	 * 
+	 * IN ORDER TO SEE HOW IT WORKS, UNCOMMENT THE PRINT FUNCTION AT THE BOTTOM AND THE STACK>PRINT COMMENT IN THE FOR LOOP>
+	 */
+	public void pushUnformatedExpression(String expression) throws InvalidExpression {
+		expression=formatString(expression);
+		char[] chars=expression.toCharArray();
+		String outputStack="";
+		boolean isValid=false;
+		for (int i=0;i<chars.length;i++) {
+			print("current state of TokenStack:");
+//			this.tokenStack.print();
+			print("\n==========NEW CYCLE==============");
+			print("current input: "+chars[i]);
+			char input=(chars[i]);
+			if (input==',') {
+				if (isValid){
+					this.pushString(outputStack);	
+					outputStack="";
+					isValid=false;
+					continue;
+				}
+				else {
+					throw new InvalidExpression(outputStack);
+				}	
+			}
+			outputStack+=input;
+			print("Current outputStack entries: "+outputStack);
+			if (this.checkValidityString(outputStack)){
+				isValid=true;
+			}
+			else {
+				if (isValid) {
+					i--;
+					this.pushString(outputStack.substring(0, outputStack.length()-1));
+				
+				
+					outputStack="";
+					isValid=false;
+					continue;
+				}
+				else if(i==chars.length){
+					throw new InvalidExpression(outputStack);
+				}
+				else {
+					continue;
+				}
+			}
+		}
+		if (isValid) {
+			this.pushString(outputStack);
+		}
+		else {
+			throw new InvalidExpression(outputStack);
+		}
+		this.reverseStack();//Place it into the correct order.
+	}
+
+	public void print(String string) {
+		//print to understand how the above works
+//		System.out.println(string);
+	}
+
+//Reverses the stack as this needs to be done depending on method of use.
+	public void reverseStack() {
+		Stack reverse=new Stack();
+		while (!this.isEmpty()) {
+			try {
+				reverse.push(this.pop());
+			} catch (EmptyStackException e) {
+				e.printStackTrace();
+			}
+		}
+		this.tokenStack=reverse;
+		
+	}
 	
 
 

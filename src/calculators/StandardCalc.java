@@ -17,8 +17,8 @@ public class StandardCalc {
 	private TokenStack operaterStack=new TokenStack();
 	private RevPolishCalc revPolish=new RevPolishCalc();
 	/** 
-	 * implementation of Wikipedia Shunting Algorithm;
-	*	// This implementation does not implement composite functions,functions with variable number of arguments, and unary operators. <br>
+	 * implementation of Wikipedia Shunting Algorithm;<br>
+	*	// this implementation accepts functions given by java math library such as pow(a,b), but not composite functions <br>
 	*	
 	*----while there are tokens to be read:<br>
 	*--------read a token.<br>
@@ -31,7 +31,8 @@ public class StandardCalc {
 	*----------------or (there is an operator at the top of the operator stack with greater precedence)<br>
 	*----------------or (the operator at the top of the operator stack has equal precedence and is left associative))<br>
 	*----------------and (the operator at the top of the operator stack is not a left bracket):<br>
-	*----------------pop operators from the operator stack onto the output queue.<br>
+	,functions with variable number of arguments, 
+	*--------------------pop operators from the operator stack onto the output queue.<br>
 	*------------push it onto the operator stack.<br>
 	*--------if the token is a left bracket (i.e. "("), then:<br>
 	*------------push it onto the operator stack.<br>
@@ -73,7 +74,7 @@ public class StandardCalc {
 										) 
 								
 							) {
-							this.outputQueue.push(this.operaterStack.pop());
+								this.outputQueue.push(this.operaterStack.pop());
 						}
 						this.operaterStack.push(token);
 					}
@@ -82,53 +83,41 @@ public class StandardCalc {
 					}
 					if (token.getType()==Type.SYMBOL && token.getSymbol()==Symbol.RIGHT_BRACKET) {;
 						
-						this.operaterStack.print();
 						while(token.getType()==Type.SYMBOL &&(this.operaterStack.top().getSymbol()!=Symbol.LEFT_BRACKET)) {
 							this.outputQueue.push(this.operaterStack.pop());
 						}
 						this.operaterStack.pop();
 					}
 				} 
-			if (tokenQueue.isEmpty()) {
-				while(!this.operaterStack.isEmpty()) {
-					if (this.operaterStack.top().getType()==Type.SYMBOL && 
-							(this.operaterStack.top().getSymbol()==Symbol.LEFT_BRACKET 
-							||this.operaterStack.top().getSymbol()==Symbol.RIGHT_BRACKET)
-						) {
-						throw new InvalidExpression("missmatched parentheses");
+				if (tokenQueue.isEmpty()) {
+					while(!this.operaterStack.isEmpty()) {
+						if (this.operaterStack.top().getType()==Type.SYMBOL && 
+								(this.operaterStack.top().getSymbol()==Symbol.LEFT_BRACKET 
+								||this.operaterStack.top().getSymbol()==Symbol.RIGHT_BRACKET)
+							) {
+							throw new InvalidExpression("missmatched parentheses");
+						}
+						this.outputQueue.push(this.operaterStack.pop());
+							
 					}
-					this.outputQueue.push(this.operaterStack.pop());
-						
 				}
-			}
-//			if there are no more tokens to read:
-//				*	    while there are still operator tokens on the stack:
-//				*	        //if the operator token on the top of the stack is a bracket, then there are mismatched parentheses. 
-//				*	        pop the operator from the operator stack onto the output queue.
-//				
 			}catch (EmptyStackException e) {
-					// TODO Auto-generated catch block
+					System.out.println("the issue was caused due to: "+e.getMessage());
 					e.printStackTrace();
 			} catch (BadTypeException e) {
-			// TODO Auto-generated catch block
+				System.out.println("the issue was caused due to: "+e.getMessage());
 			e.printStackTrace();
 		} catch (BadSymbolException e) {
+				System.out.println("the issue was caused due to: "+e.getMessage());
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		this.outputQueue.print();
 		TokenStack revOutputQueue=new TokenStack();
-		while (!outputQueue.isEmpty()) {
-			try {
-				revOutputQueue.push(outputQueue.pop());
-			} catch (EmptyStackException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return revPolish.calculateStack(revOutputQueue);
+		this.outputQueue.reverseStack();
+		
+		return revPolish.calculateStack(this.outputQueue);
 	}
 	public void print(String string) {
-		System.out.println(string);
+		//System.out.println(string);
 	}
 }

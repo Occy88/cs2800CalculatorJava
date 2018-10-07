@@ -32,9 +32,9 @@ class RevPolishCalcTest {
 	
 	@Test
 	void testAlgorithm() throws InvalidExpression, EmptyStackException {
-		float result=calc.calculateString("5 2 pow");
+		float result=calc.calculateString("5 ,2 pow");
 		assertEquals((float) 25,result,"result is incorrect from expression");
-		System.out.println(result);
+//		System.out.println(result);
 	}
 	
 	/*

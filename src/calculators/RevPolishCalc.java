@@ -28,7 +28,7 @@ public class RevPolishCalc {
 	 */
 	public float calculateString(String string) throws InvalidExpression {
 		TokenStack tokenStack =new TokenStack();
-		tokenStack.pushExpression(string);
+		tokenStack.pushUnformatedExpression(string);
 		return calculateStack(tokenStack);
 	}
 	
@@ -59,12 +59,10 @@ public class RevPolishCalc {
 	 */
 	
 	public float calculateStack(TokenStack tokenStack) throws InvalidExpression {
-	
 		while (!tokenStack.isEmpty()) {
 			
 			try {
-					System.out.print("printing num: ");
-					numStack.print();
+					
 					Entry token= tokenStack.pop();
 				if (token.getType()==Type.FUNCTION) {
 					float operand_1,operand2,result;
@@ -72,13 +70,11 @@ public class RevPolishCalc {
 					switch (numberOfOperands) {
 					
 					case 1:
-						System.out.println("detected one function");
 						operand_1=numStack.pop();
 						result=calculator.calculateFunction(token.getFunction(), operand_1, 0);
 						numStack.push(result);	
 						break;
 					case 2:
-						System.out.println("detected double function");
 						operand2=numStack.pop();
 						operand_1=numStack.pop();
 						result=calculator.calculateFunction(token.getFunction(), operand_1, operand2);
@@ -99,22 +95,23 @@ public class RevPolishCalc {
 					numStack.push(token.getValue());
 				}
 			}
-			catch (BadSymbolException ex3) {
-				throw new InvalidExpression("postfix expression entered is invalid");
+			catch (BadSymbolException e) {
+				
+				throw new InvalidExpression("postfix expression entered is invalid have you entered a wrong symbol?: "+e.getMessage());
 			}
-			catch(EmptyStackException ex) {
-			}catch(BadTypeException ex2) {
-				throw new InvalidExpression("postfix expression entered is invalid");
+			catch(EmptyStackException e) {
+				throw new InvalidExpression("expression is invalid, have you entered missmatched brackets?: "+e.getMessage());
+			}catch(BadTypeException e) {
+				throw new InvalidExpression("This exception happens if the algorithm thought it popped an entry of a type x when it was actually of type y, it shouldn't happen unless tampered with: "+e.getMessage());
 			}		
 		}
 		try {
-			numStack.print();
 			float result=numStack.pop();
 			if( numStack.isEmpty()){
 				return result;
 			}
 			else {
-				throw new InvalidExpression("this is not a valid expression");
+				throw new InvalidExpression("not a valid expression most likely due to missmatched brackets.");
 			}
 		} catch (EmptyStackException | BadTypeException e) {
 			return 0;
