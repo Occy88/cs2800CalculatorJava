@@ -33,7 +33,7 @@ public enum Symbol{
 		}
 	throw new BadSymbolException(string);
 	}
-	public static int getPresetence(Symbol symbol) throws BadSymbolException {
+	public static int getPrecedence(Symbol symbol) throws BadSymbolException {
 		switch(symbol) {
 		case POWER:
 			return 4;

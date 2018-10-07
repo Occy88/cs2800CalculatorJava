@@ -68,8 +68,8 @@ public class StandardCalc {
 									)	
 									&&
 								(	(this.operaterStack.top().getType()==Type.FUNCTION)
-									|| (Symbol.getPresetence(token.getSymbol()) < Symbol.getPresetence(this.operaterStack.top().getSymbol()))
-									|| (Symbol.getPresetence(token.getSymbol()) == Symbol.getPresetence(this.operaterStack.top().getSymbol()))
+									|| (Symbol.getPrecedence(token.getSymbol()) < Symbol.getPrecedence(this.operaterStack.top().getSymbol()))
+									|| (Symbol.getPrecedence(token.getSymbol()) == Symbol.getPrecedence(this.operaterStack.top().getSymbol()))
 										) 
 								
 							) {

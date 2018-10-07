@@ -24,6 +24,11 @@ class RevPolishCalcTest {
 	private RevPolishCalc calc=new RevPolishCalc();
 	private TokenStack postfixExpressionStack=new TokenStack();
 	
+	@Test
+	void classExists(){
+		RevPolishCalc calculator=new RevPolishCalc();
+		
+	}
 	
 	@Test
 	void testAlgorithm() throws InvalidExpression, EmptyStackException {
