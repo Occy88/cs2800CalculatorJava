@@ -69,12 +69,14 @@ public class Stack {
 	/**
 	 * prints all current entries in {@linkplain #entries}
 	 */
-	public void print()  {
-		
+	public String print()  {
+		String r="";
 		for (int i=this.size-1;i>=0;i--)
 		{
-			System.out.print("["+this.entries.get(i).toString()+"]");
+			r+=("["+this.entries.get(i).toString()+"]");
 		}
+		System.out.println(r);
+		return r;
 		
 	}
 

@@ -35,6 +35,10 @@ public enum Symbol{
 	}
 	public static int getPrecedence(Symbol symbol) throws BadSymbolException {
 		switch(symbol) {
+		case RIGHT_BRACKET://not needed for reverse polish
+			return 5;
+		case LEFT_BRACKET://not needed for reverse polish
+			return 5;
 		case POWER:
 			return 4;
 			

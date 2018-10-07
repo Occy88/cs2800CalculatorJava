@@ -15,7 +15,7 @@ public class InvalidExpression extends Exception {
 	 * 
 	 */
 	public InvalidExpression(String expression) {
-		this.message="Types are not equal Exception: "+expression;
+		this.message=expression;
 	}
 	/**
 	 * @return {@link #message}

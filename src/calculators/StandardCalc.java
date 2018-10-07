@@ -18,7 +18,7 @@ public class StandardCalc {
 	private RevPolishCalc revPolish=new RevPolishCalc();
 	/** 
 	 * implementation of Wikipedia Shunting Algorithm;<br>
-	*	// this implementation accepts functions given by java math library such as pow(a,b), but not composite functions <br>
+	*	// this implemefntation accepts functions given by java math library such as pow(a,b), but not composite functions <br>
 	*	
 	*----while there are tokens to be read:<br>
 	*--------read a token.<br>
@@ -50,6 +50,7 @@ public class StandardCalc {
 	*/
 	public float shuntingAlgorithm(TokenStack tokenQueue) throws InvalidExpression {
 		try {
+			
 			while(!tokenQueue.isEmpty()) {
 					Entry token=tokenQueue.pop();
 					if(token.getType()==Type.NUMBER) {
@@ -83,14 +84,16 @@ public class StandardCalc {
 					}
 					if (token.getType()==Type.SYMBOL && token.getSymbol()==Symbol.RIGHT_BRACKET) {;
 						
-						while(token.getType()==Type.SYMBOL &&(this.operaterStack.top().getSymbol()!=Symbol.LEFT_BRACKET)) {
+						while(!(this.operaterStack.top().getType()==Type.SYMBOL&&this.operaterStack.top().getSymbol()==Symbol.LEFT_BRACKET)) {
 							this.outputQueue.push(this.operaterStack.pop());
 						}
 						this.operaterStack.pop();
 					}
 				} 
-				if (tokenQueue.isEmpty()) {
+			
+				if (tokenQueue.isEmpty()) {;
 					while(!this.operaterStack.isEmpty()) {
+						
 						if (this.operaterStack.top().getType()==Type.SYMBOL && 
 								(this.operaterStack.top().getSymbol()==Symbol.LEFT_BRACKET 
 								||this.operaterStack.top().getSymbol()==Symbol.RIGHT_BRACKET)
@@ -101,23 +104,25 @@ public class StandardCalc {
 							
 					}
 				}
-			}catch (EmptyStackException e) {
+			}catch (EmptyStackException | BadTypeException | BadSymbolException e) {
 					System.out.println("the issue was caused due to: "+e.getMessage());
 					e.printStackTrace();
-			} catch (BadTypeException e) {
-				System.out.println("the issue was caused due to: "+e.getMessage());
-			e.printStackTrace();
-		} catch (BadSymbolException e) {
-				System.out.println("the issue was caused due to: "+e.getMessage());
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		TokenStack revOutputQueue=new TokenStack();
+					throw new InvalidExpression(e.getMessage());
+			} 
 		this.outputQueue.reverseStack();
 		
 		return revPolish.calculateStack(this.outputQueue);
 	}
 	public void print(String string) {
 		//System.out.println(string);
+	}
+	public void printAll() {
+		System.out.println("OP STACK: ");
+		this.operaterStack.print();
+		System.out.println("OUT QUEUE STACK: ");
+		this.outputQueue.print();
+		this.revPolish.printAll();
+		// TODO Auto-generated method stub
+		
 	}
 }

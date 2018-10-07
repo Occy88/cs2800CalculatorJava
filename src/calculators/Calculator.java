@@ -29,7 +29,7 @@ public class Calculator {
 			return operand_1 *operand_2;
 		case DIVIDE:
 			if (operand_2==0) {
-				throw new InvalidExpression(Float.toString(operand_1)+operator.toString()+Float.toString(operand_2));
+				throw new InvalidExpression(Float.toString(operand_1)+"	| "+operator.toString()+" | "+Float.toString(operand_2));
 			}
 			return operand_1 /operand_2;
 		default: throw new InvalidExpression(Float.toString(operand_1)+", "+operator.toString()+", "+Float.toString(operand_2));

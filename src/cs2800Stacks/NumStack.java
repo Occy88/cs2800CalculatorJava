@@ -40,8 +40,9 @@ public class NumStack {
 	/**
 	 * prints stack
 	 */
-	public void print() {
-		this.numStack.print();
+	public String print() {
+		
+		return this.numStack.print();
 	}
 
 }

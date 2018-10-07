@@ -13,7 +13,7 @@ import cs2800Entry.Type;
 /**
  * 
  * This Class builds a {@link Stack} of tokens fed into {@link RevPolishCalc} and {@link StandardCalc}<br>
- * input is taken as a {@link String} expression separating variables by a space.<br>
+ * input is taken as a {@link String} expression, accepts Math functions i.e.: pow(2,3).<br>
  * input is converted into a reversed stack for (postfix) computation).<br><br>
  * e.g.: for expression "((a+b)^c)/d"<br><br>
  * input: <br>

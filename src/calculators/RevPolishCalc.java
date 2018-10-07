@@ -60,10 +60,12 @@ public class RevPolishCalc {
 	
 	public float calculateStack(TokenStack tokenStack) throws InvalidExpression {
 		while (!tokenStack.isEmpty()) {
+			Entry token = new Entry("Empty");
+			
 			
 			try {
 					
-					Entry token= tokenStack.pop();
+					token= tokenStack.pop();
 				if (token.getType()==Type.FUNCTION) {
 					float operand_1,operand2,result;
 					int numberOfOperands=Function.numberOfOperands(token.getFunction());
@@ -75,8 +77,11 @@ public class RevPolishCalc {
 						numStack.push(result);	
 						break;
 					case 2:
+						
 						operand2=numStack.pop();
 						operand_1=numStack.pop();
+						
+					
 						result=calculator.calculateFunction(token.getFunction(), operand_1, operand2);
 						numStack.push(result);
 						break;
@@ -95,27 +100,38 @@ public class RevPolishCalc {
 					numStack.push(token.getValue());
 				}
 			}
-			catch (BadSymbolException e) {
-				
-				throw new InvalidExpression("postfix expression entered is invalid have you entered a wrong symbol?: "+e.getMessage());
+			catch(BadTypeException e) {
+				throw new InvalidExpression(e.getMessage()+ " : errorType");
 			}
-			catch(EmptyStackException e) {
-				throw new InvalidExpression("expression is invalid, have you entered missmatched brackets?: "+e.getMessage());
-			}catch(BadTypeException e) {
-				throw new InvalidExpression("This exception happens if the algorithm thought it popped an entry of a type x when it was actually of type y, it shouldn't happen unless tampered with: "+e.getMessage());
-			}		
+			catch ( EmptyStackException  e) {
+				throw new InvalidExpression("INVALID REV EXPRESSION token responsible: "+token.toString());
+			}catch(BadSymbolException e) {
+				throw new InvalidExpression("ErrorSymbol: "+e.getMessage());
+			}
+			
 		}
 		try {
+			System.out.println("Bad Type here1");
 			float result=numStack.pop();
 			if( numStack.isEmpty()){
 				return result;
 			}
 			else {
-				throw new InvalidExpression("not a valid expression most likely due to missmatched brackets.");
+				throw new InvalidExpression("stack not empty, invalid expression: "+numStack.print());
 			}
 		} catch (EmptyStackException | BadTypeException e) {
-			return 0;
+			System.out.println("Bad Type here");
+			e.printStackTrace();
+			throw new InvalidExpression("empty Expression or invalid Expression" + this.numStack.print());
 		}
+		
+	}
+
+
+	public void printAll() {
+		System.out.println("NUM STACK: ");
+		this.numStack.print();
+		// TODO Auto-generated method stub
 		
 	}
 
