@@ -59,6 +59,8 @@ public class RevPolishCalc {
 	 */
 	
 	public float calculateStack(TokenStack tokenStack) throws InvalidExpression {
+		tokenStack.print();
+		System.out.println("Calculating postfix Stack");
 		while (!tokenStack.isEmpty()) {
 			Entry token = new Entry("Empty");
 			
@@ -111,7 +113,6 @@ public class RevPolishCalc {
 			
 		}
 		try {
-			System.out.println("Bad Type here1");
 			float result=numStack.pop();
 			if( numStack.isEmpty()){
 				return result;
@@ -120,7 +121,6 @@ public class RevPolishCalc {
 				throw new InvalidExpression("stack not empty, invalid expression: "+numStack.print());
 			}
 		} catch (EmptyStackException | BadTypeException e) {
-			System.out.println("Bad Type here");
 			e.printStackTrace();
 			throw new InvalidExpression("empty Expression or invalid Expression" + this.numStack.print());
 		}

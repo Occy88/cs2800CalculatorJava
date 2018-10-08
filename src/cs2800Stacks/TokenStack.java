@@ -233,45 +233,61 @@ public class TokenStack {
 	 * @throws InvalidExpression
 	 */
 	/*
-	 * Pseudo code for this function:
+	 * 
+	 * -----------------------------
 	 * input expression --> Pow 5,4 +
 	 * format expression--> pow5,4+
 	 * convert to char array -->[p] [o] ...
 	 * push each value onto string stack:
 	 * two stacks:
 	 * queue stack containing characters of expression in reverse i.e top of stack=start of expression
-	 * output stack containing the expression to be pushed as a string
-	 * in this function char arrays will be used instead of stacks to facilitate to string conversion given by java
+	 * output stack containing the expression to be pushed as a string onto the tokenStack used by calculators classes
+	 * in this function char array and a string will be used instead of stacks to facilitate to string conversion given by java
 	 * 
 	 * check() function, tests if a string can be pushed to expression
+	 * 
+	 * Pseudo code for this function:
+	 * inputStream stack= input expression
+	 * outputStream stack = string created from input stream checked for validity for pushing onto Token Stack.
+	 * 
 	 * boolean isValid = false
 	 * while input stack is not empty:
-	 * 		char input=(inputStack.pop()
-	 * 		if input == ","
-	 * 			if isValid:
-	 * 				push(outputStack)
-	 * 				outputStack.clear()
-	 * 				isValid=False
+	 * 		char input=inputStack.pop()
+	 * 		if input is a ","
+	 * 			if boolean isValid:
+	 * 				push input onto (outputStack)
+	 * 				clear the outputStack
+	 * 				reset boolean isValid=False
 	 * 				continue;
 	 * 			else
-	 * 				throw invalid expression
-	 * 		outputStack.push(input)
-	 * 		if check(outputStack.toString()):
-	 * 			isValid=true
+	 * 				throw invalid expression exception
+	 * 		push input onto output stack
+	 * 		if output stack is a valid expression):
+	 * 			set boolean isValid=true
 	 * 		else:
-	 * 			if isValid:
+	 * 			if boolean isValid:
 	 * 				inputStack.push(outputStack.pop())
-	 * 				push(outputStack)
+	 * 				push outputStack onto the tokenStack
 	 * 				outputStack.clear()
 	 * 				isValid=false
 	 * 				continue;
 	 * 			else:
-	 * 				throw invalid expression
+	 * 				throw invalid expression exception
 	 * if isValid:
-	 * 		push(outputStack)
+	 * 		push(outputStack) to tokenStack
 	 * else:
-	 * 		throw invalid expression.
-	 * 		
+	 * 		throw invalid expression exception
+	 * 
+	 * how do we deal with multiple signs (---2) (+++2)(2+-1)(2--1) e.t.c.
+	 * well try
+	 *
+	 * if you come accross a sign:
+	 * 		while the next item is a sign:
+	 * 			if it's -+ or +- convert input to - continue
+	 * 			if it's -- or ++ convert input to + continue
+	 * 			break;
+	 * check if the current item on the stack is valid and push it or throw error
+	 * push the sign so it's not seen as a float by Float.parse
 	 * 
 	 * IN ORDER TO SEE HOW IT WORKS, UNCOMMENT THE PRINT FUNCTION AT THE BOTTOM AND THE STACK>PRINT COMMENT IN THE FOR LOOP>
 	 */
@@ -281,11 +297,105 @@ public class TokenStack {
 		String outputStack="";
 		boolean isValid=false;
 		for (int i=0;i<chars.length;i++) {
+			
 			print("current state of TokenStack:");
 //			this.tokenStack.print();
 			print("\n==========NEW CYCLE==============");
 			print("current input: "+chars[i]);
 			char input=(chars[i]);
+			if (input=='+'||input=='-') {
+				while(i<chars.length-1) {
+					if(chars[i+1]=='+'||chars[i+1]=='-') {
+						if (input=='+') {
+							if (chars[i+1]=='-') {
+								input='-';
+								i++;
+								continue;
+							}else {
+								i++;
+								continue;
+							}
+						}else {
+							if (chars[i+1]=='-') {
+								input='+';
+								i++;
+								continue;
+							}
+							else {
+								i++;
+								continue;
+							}
+						}
+					}break;
+					
+				}
+			}
+			if (input=='+'||input=='-')//need to be pushed separately as don't want to evaluate to float but operator token
+			{if (input=='+'||input=='-') {
+				while(i<chars.length-1) {
+					if(chars[i+1]=='+'||chars[i+1]=='-') {
+						if (input=='+') {
+							if (chars[i+1]=='-') {
+								input='-';
+								i++;
+								continue;
+							}else {
+								i++;
+								continue;
+							}
+						}else {if (input=='+'||input=='-') {
+							while(i<chars.length-1) {
+								if(chars[i+1]=='+'||chars[i+1]=='-') {
+									if (input=='+') {
+										if (chars[i+1]=='-') {
+											input='-';
+											i++;
+											continue;
+										}else {
+											i++;
+											continue;
+										}
+									}else {
+										if (chars[i+1]=='-') {
+											input='+';
+											i++;
+											continue;
+										}
+										else {
+											i++;
+											continue;
+										}
+									}
+								}break;
+								
+							}
+						}
+							if (chars[i+1]=='-') {
+								input='+';
+								i++;
+								continue;
+							}
+							else {
+								i++;
+								continue;
+							}
+						}
+					}break;
+					
+				}
+			}
+				if (isValid){
+					this.pushString(outputStack);
+					this.pushString(""+input);
+					
+					outputStack="";
+					isValid=false;
+					continue;
+				}
+				else {
+					throw new InvalidExpression("Invalid expression, stack:"+ outputStack);
+				}	
+			}
 			if (input==',') {
 				if (isValid){
 					this.pushString(outputStack);	
@@ -294,7 +404,7 @@ public class TokenStack {
 					continue;
 				}
 				else {
-					throw new InvalidExpression(outputStack);
+					throw new InvalidExpression("Invalid expression, stack:"+ outputStack);
 				}	
 			}
 			outputStack+=input;
@@ -313,7 +423,7 @@ public class TokenStack {
 					continue;
 				}
 				else if(i==chars.length){
-					throw new InvalidExpression(outputStack);
+					throw new InvalidExpression("Invalid expression, stack: "+ outputStack);
 				}
 				else {
 					continue;
@@ -324,9 +434,10 @@ public class TokenStack {
 			this.pushString(outputStack);
 		}
 		else {
-			throw new InvalidExpression(outputStack);
+			throw new InvalidExpression("Invalid or empty string , stack:  "+outputStack);
 		}
 		this.reverseStack();//Place it into the correct order.
+		this.tokenStack.print();
 	}
 
 	public void print(String string) {
