@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import calculators.InvalidExpression;
 import cs2800Entry.BadTypeException;
 import cs2800Entry.Entry;
+import cs2800Entry.Function;
 import cs2800Entry.Symbol;
 import cs2800Stacks.EmptyStackException;
 import cs2800Stacks.TokenStack;
@@ -24,6 +25,7 @@ import cs2800Stacks.TokenStack;
  */
 
 class TokenStackTest {
+
     private float float1=4,float2=5;
 	private Symbol symbol;
 	private String string="string";
@@ -62,6 +64,7 @@ class TokenStackTest {
 	 */
 	@Test 
 	void tokenStackPopFunction() throws EmptyStackException {
+		System.out.println("Hello");
 		TokenStack tokenStack=new TokenStack();
 		tokenStack.push(float1);
 		tokenStack.pop();
@@ -155,7 +158,7 @@ class TokenStackTest {
 		isFunction=tokenStack.testFunction("pow");
 		assertTrue(isFunction,"returned should be true if string is a symbol");
 	}
-// this test has now been replaced with a function to push any string rather than one of a specific format.
+// this test was stupid as nobody enters expressions with consistent black characers.
 //	/**
 //	 * function that checks for parses expression, checks for float
 //	 * checks for symbol, pushes to stack, and throws if input is invalid;
@@ -190,36 +193,165 @@ class TokenStackTest {
 	@Test
 	void convertStringNoCapsNoSpaces() {
 		TokenStack tokenStack=new TokenStack();
-		String converted=tokenStack.formatString("Test s T R i n g");
-		assertEquals(converted,"teststring","not converted correctly");
+		tokenStack.setExpression("E x P r E");
+		tokenStack.removeSpaceAndCaps();
+		assertEquals(tokenStack.getExpression(),"expre");
 	}
- 
 	/**
-	 * this test takes any string that represents a standard expression and decides if entered variables are legal or not
-	 * and pushes them onto the stack.
-	 * then pushes it
+	 * Test #
+	 * check if TokenStack can push a valid single string and reject an invalid single string i.e. ("+") accepted ("b") rejected
+	 * this can be a sign, function or float.
+	 * @throws EmptyStackException 
+	 * @throws BadTypeException 
 	 */
 	@Test
-	void pushAnyPostfixExpressionToStackFromString() {
+	void pushString() throws BadTypeException, EmptyStackException {
 		TokenStack tokenStack=new TokenStack();
-		String expression1="7 * Pokw( 3/2 , 6 )"; //invalid expression
-		String expression2="7 * Pow( 3/2 ,6 )"; // 9 valid variables, "," represents break and is not pushed
+		try {
+
+			tokenStack.pushString("pow");
+			assertEquals(tokenStack.top().getFunction(),Function.POW);
+		}catch(InvalidExpression e) {
+			System.out.println(e.getMessage());
+			fail("expected to push tokens with separator.");
+		}
 		
-		try {
-			tokenStack.pushUnformatedExpression(expression1);
-			tokenStack.print();
-			fail("expected following expression to be thrown: "+expression1);
-		}catch (InvalidExpression ex) {};
-		tokenStack=new TokenStack();
-		try {
-			tokenStack.pushUnformatedExpression(expression2);
-			tokenStack.print();
-			assertEquals(tokenStack.size(),9,"expected 9 variables to be pushed in the following expression: "+expression2);
-		}catch (InvalidExpression ex) {
-			System.out.println(ex.getMessage());
-			fail("expected following expression to be pushed:"+expression2);
-		};
 	}
+	/**
+	 * Test #
+	 * evaluates expression in {@linkplain TokenStack} for multiple '+' '-' characters in sequence and reduces them to the correct sign.
+	 * e.g.: <br>
+	 * this.expression=5++-23-1 => this.expression = "5-23-1"
+	 * jk12l => return false<br>
+	 */
+	@Test
+	void reducePlusMinusCharArrayTest() {
+		TokenStack tokenStack=new TokenStack();
+		String test= "+-+--ab--+cd";
+		tokenStack.setExpression(test);
+		tokenStack.reducePlusMinusSigns();
+		String expected="-ab+cd";
+		assertEquals(tokenStack.getExpression(),expected);
+	}
+	/**
+	 * This tests a function that tests for a first float or function in a string,
+	 * pushes if it is valid and removes it from the expression held in the class.
+	 * e.g.:<br>
+	 * pow54bda => push("pow") this.expression = "54bda" return true<br>
+	 * 43.1abc => push(43.1) this.expression = "abc" return true<br>
+	 * jk12l => return false<br>
+	 * 
+	 * @return boolean 
+	 * @throws BadTypeException
+	 * @throws EmptyStackException
+	 */
+	@Test
+	void testIfFirstFunctionOrFloatIsPushed() throws BadTypeException, EmptyStackException {
+		TokenStack tokenStack=new TokenStack();
+		tokenStack.setExpression("powasdf");
+		assertTrue(tokenStack.testAndPushNextFunctionOrFloat());
+		
+		tokenStack=new TokenStack();
+		tokenStack.setExpression("sinhasdf");
+		tokenStack.testAndPushNextFunctionOrFloat();
+		assertEquals("asdf",tokenStack.getExpression());
+		assertEquals(Function.SINH,tokenStack.top().getFunction());
+		
+		tokenStack=new TokenStack();
+		tokenStack.setExpression("5powasdf");
+		assertTrue(tokenStack.testAndPushNextFunctionOrFloat());
+		
+		tokenStack=new TokenStack();
+		tokenStack.setExpression("5.2sinhasdf");
+		tokenStack.testAndPushNextFunctionOrFloat();
+		assertEquals("sinhasdf",tokenStack.getExpression());
+		assertEquals((float)5.2,tokenStack.top().getValue());
+		
+	}
+	@Test
+	void testIfFirstOperatorIsPushed() throws BadTypeException, EmptyStackException {
+		TokenStack tokenStack=new TokenStack();
+		tokenStack.setExpression("+asdf");
+		assertTrue(tokenStack.testAndPushNextOperator(false));
+		
+		tokenStack=new TokenStack();
+		tokenStack.setExpression("-sinhasdf");
+		tokenStack.testAndPushNextOperator(false);
+		assertEquals(tokenStack.getExpression(),"sinhasdf");
+		assertEquals(Symbol.MINUS,tokenStack.top().getSymbol());
+		
+	}
+	@Test
+	void pushValidFormatedExpressionTest(){
+		try {
+			TokenStack tokenStack=new TokenStack();
+			tokenStack.setExpression("+--5+4.2");
+			tokenStack.pushUnformatedExpression(true);//6 characters '+,-,-,5,+,4.2'
+			assertEquals(5,tokenStack.size());
+			}catch (InvalidExpression e) {
+				System.out.println(e.getMessage());
+			}
+		
+	}
+	@Test
+	void pushValidUnformatedExpressionTest()  {
+		try {
+		TokenStack tokenStack=new TokenStack();
+		tokenStack.setExpression("+3-2");
+		tokenStack.pushUnformatedExpression(true);//5 characters '+- == -' '135' 'pow' '(' '423'
+		tokenStack.print();
+		System.out.println("Size:"+tokenStack.size());
+		assertEquals(5,tokenStack.size());
+		}catch (InvalidExpression e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	@Test
+	void acceptCommaAsSeparator()  {
+	
+		try {
+		TokenStack tokenStack=new TokenStack();
+		tokenStack.setExpression("+-1,3,5 Pow(4,23)");
+		tokenStack.pushUnformatedExpression(true);//10 variables (comma is just separator)
+		tokenStack.print();
+		assertEquals(10,tokenStack.size());
+		}
+		catch (InvalidExpression e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	
+	/**
+	 * push postfix expression
+	 */
+	@Test
+	void pushPostfix() {
+		try {
+			TokenStack tokenStack=new TokenStack();
+			tokenStack.setExpression("+++--3");
+			tokenStack.pushUnformatedExpression(false);//10 variables (comma is just separator)
+			assertEquals(6,tokenStack.size());
+			}
+			catch (InvalidExpression e) {
+				fail(e.getMessage());
+			}
+	}
+	@Test
+	void addZeroBeforeEmptyOperator() {
+		try {
+			TokenStack tokenStack=new TokenStack();
+			tokenStack.setExpression("+3");
+			tokenStack.pushUnformatedExpression(true);//10 variables (comma is just separator)
+			assertEquals(3,tokenStack.size());
+			}
+			catch (InvalidExpression e) {
+				fail(e.getMessage());
+			}
+		
+	
+	}
+	
 		
 		
 		

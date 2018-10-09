@@ -49,7 +49,7 @@ public class StandardCalc {
 	 * @throws InvalidExpression 
 	*/
 	public float shuntingAlgorithm(TokenStack tokenQueue) throws InvalidExpression {
-		tokenQueue.print();
+//		tokenQueue.print();
 		try {
 			
 			while(!tokenQueue.isEmpty()) {
@@ -86,21 +86,15 @@ public class StandardCalc {
 						this.operaterStack.push(token);
 					}
 					if (token.getType()==Type.SYMBOL && token.getSymbol()==Symbol.RIGHT_BRACKET) {;
-						print("operatorStack:");
-						this.operaterStack.print();
-						this.outputQueue.print();
+					
+					
 						
 						while(!(this.operaterStack.top().getType()==Type.SYMBOL&&this.operaterStack.top().getSymbol()==Symbol.LEFT_BRACKET)) {
-							System.out.println("not found left bracket");
+						
 							this.outputQueue.push(this.operaterStack.pop());
 						}
 						this.operaterStack.pop();
-						print("after:");
 					
-						
-						this.outputQueue.print();
-						this.operaterStack.print();
-						print("done");
 					}
 				} 
 			

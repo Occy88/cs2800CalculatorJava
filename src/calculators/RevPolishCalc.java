@@ -28,7 +28,9 @@ public class RevPolishCalc {
 	 */
 	public float calculateString(String string) throws InvalidExpression {
 		TokenStack tokenStack =new TokenStack();
-		tokenStack.pushUnformatedExpression(string);
+		tokenStack.setExpression(string);
+		tokenStack.pushUnformatedExpression(false);
+		tokenStack.print();
 		return calculateStack(tokenStack);
 	}
 	
@@ -59,8 +61,7 @@ public class RevPolishCalc {
 	 */
 	
 	public float calculateStack(TokenStack tokenStack) throws InvalidExpression {
-		tokenStack.print();
-		System.out.println("Calculating postfix Stack");
+
 		while (!tokenStack.isEmpty()) {
 			Entry token = new Entry("Empty");
 			

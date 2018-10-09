@@ -51,12 +51,11 @@ class StandardCalcTest {
 			try {
 				calc=new StandardCalc();
 //				System.out.println("Pushing expression to stack");
-				tokenStack.pushUnformatedExpression(expression);
+				tokenStack.pushUnformatedExpression(true);
 //				System.out.println("Senting expression to Algo");
 				result = calc.shuntingAlgorithm(tokenStack);
 				sresult=Float.toString(result);
 				System.out.println("result: "+Float.toString(result));
-				System.out.println(2*9-6*Math.pow(9,2)+2);
 			} catch (InvalidExpression e) {
 				// TODO Auto-generated catch block
 				tokenStack=new TokenStack();

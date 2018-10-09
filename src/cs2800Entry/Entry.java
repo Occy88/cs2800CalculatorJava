@@ -22,6 +22,7 @@ public class Entry {
 	 */
 	private String str;
 	/**
+	 * defines type of argument held in {@linkplain entry}
 	 * for throwing {@link BadTypeException} in 
 	 * {@link #getString()},
 	 * {@link #getValue()},

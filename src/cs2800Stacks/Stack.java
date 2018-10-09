@@ -21,7 +21,7 @@ public class Stack {
 	/**
 	 * size variable holding the current number of entries in the stack
 	 */
-	private int size;
+	private int size=0;
 	
 	/**
 	 * function pushing {@link Entry} instance to {@link #entries}

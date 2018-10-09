@@ -13,7 +13,7 @@ public class BadTypeException extends Exception {
 	 */
 	private String message;
 	/**
-	 * constructs error message from two {@link Type} values that dont match
+	 * constructs error message from two {@link Type} values that don't match
 	 * @param typeA
 	 * @param typeB
 	 */
