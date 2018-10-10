@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import cs2800Entry.Symbol;
-import cs2800Stacks.EmptyStackException;
-import cs2800Stacks.OpStack;
+import entry.Symbol;
+import stacks.EmptyStackException;
+import stacks.OpStack;
 
 
 /**

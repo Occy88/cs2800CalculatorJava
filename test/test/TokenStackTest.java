@@ -9,13 +9,12 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import calculators.InvalidExpression;
-import cs2800Entry.BadTypeException;
-import cs2800Entry.Entry;
-import cs2800Entry.Function;
-import cs2800Entry.Symbol;
-import cs2800Stacks.EmptyStackException;
-import cs2800Stacks.TokenStack;
-import cs2800Stacks.TokenStack;
+import entry.BadTypeException;
+import entry.Entry;
+import entry.Function;
+import entry.Symbol;
+import stacks.EmptyStackException;
+import stacks.TokenStack;
 
 /**
  * This class tests the {@link TokenStack} class.

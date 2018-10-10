@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import cs2800Entry.BadTypeException;
-import cs2800Entry.Entry;
-import cs2800Entry.Symbol;
+import entry.BadTypeException;
+import entry.Entry;
+import entry.Symbol;
 /**
  * This class tests the {@link Entry} class.
  * 

@@ -1,4 +1,4 @@
-package cs2800Entry;
+package entry;
 
 public class BadSymbolException extends Exception {
 	private String message;

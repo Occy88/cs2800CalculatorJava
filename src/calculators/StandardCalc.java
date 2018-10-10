@@ -1,12 +1,12 @@
 package calculators;
 
-import cs2800Entry.BadSymbolException;
-import cs2800Entry.BadTypeException;
-import cs2800Entry.Entry;
-import cs2800Entry.Symbol;
-import cs2800Entry.Type;
-import cs2800Stacks.EmptyStackException;
-import cs2800Stacks.TokenStack;
+import entry.BadSymbolException;
+import entry.BadTypeException;
+import entry.Entry;
+import entry.Symbol;
+import entry.Type;
+import stacks.EmptyStackException;
+import stacks.TokenStack;
 /**
  * calculates string expression in standard notation.
  * @author octavio

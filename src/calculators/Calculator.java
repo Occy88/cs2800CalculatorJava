@@ -1,7 +1,7 @@
 package calculators;
 
-import cs2800Entry.Function;
-import cs2800Entry.Symbol;
+import entry.Function;
+import entry.Symbol;
 /**
  * calculates result between :<br>
  * two operands and an operator e.g. 4+4,<br>

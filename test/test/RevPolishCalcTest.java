@@ -11,9 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import calculators.Calculator;
 import calculators.InvalidExpression;
 import calculators.RevPolishCalc;
-import cs2800Entry.Symbol;
-import cs2800Stacks.EmptyStackException;
-import cs2800Stacks.TokenStack;
+import entry.Symbol;
+import stacks.EmptyStackException;
+import stacks.TokenStack;
 
 /**
  * This class tests the {@link RevPolishCalc} class.<br>

@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import cs2800Entry.Entry;
-import cs2800Stacks.EmptyStackException;
-import cs2800Stacks.Stack;
+import entry.Entry;
+import stacks.EmptyStackException;
+import stacks.Stack;
 /**
  * This class tests the {@link Stack} class.
  * 

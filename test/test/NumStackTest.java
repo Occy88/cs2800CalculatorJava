@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import cs2800Entry.BadTypeException;
-import cs2800Stacks.EmptyStackException;
-import cs2800Stacks.NumStack;
+import entry.BadTypeException;
+import stacks.EmptyStackException;
+import stacks.NumStack;
 
 
 /**

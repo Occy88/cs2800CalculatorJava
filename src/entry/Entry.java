@@ -1,4 +1,4 @@
-package cs2800Entry;
+package entry;
 
 /**
  * This class is the {@link Entry} class.<br>

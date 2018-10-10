@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import calculators.Calculator;
 import calculators.InvalidExpression;
-import cs2800Entry.Function;
-import cs2800Entry.Symbol;
+import entry.Function;
+import entry.Symbol;
 
 /**
  * This class tests the {@link Calculator} class.<br>
