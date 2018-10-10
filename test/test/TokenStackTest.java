@@ -248,21 +248,21 @@ class TokenStackTest {
 	void testIfFirstFunctionOrFloatIsPushed() throws BadTypeException, EmptyStackException {
 		TokenStack tokenStack=new TokenStack();
 		tokenStack.setExpression("powasdf");
-		assertTrue(tokenStack.testAndPushNextFunctionOrFloat());
+		assertTrue(tokenStack.testAndPushNextFunctionOrFloat(false));
 		
 		tokenStack=new TokenStack();
 		tokenStack.setExpression("sinhasdf");
-		tokenStack.testAndPushNextFunctionOrFloat();
+		tokenStack.testAndPushNextFunctionOrFloat(false);
 		assertEquals("asdf",tokenStack.getExpression());
 		assertEquals(Function.SINH,tokenStack.top().getFunction());
 		
 		tokenStack=new TokenStack();
 		tokenStack.setExpression("5powasdf");
-		assertTrue(tokenStack.testAndPushNextFunctionOrFloat());
+		assertTrue(tokenStack.testAndPushNextFunctionOrFloat(false));
 		
 		tokenStack=new TokenStack();
 		tokenStack.setExpression("5.2sinhasdf");
-		tokenStack.testAndPushNextFunctionOrFloat();
+		tokenStack.testAndPushNextFunctionOrFloat(false);
 		assertEquals("sinhasdf",tokenStack.getExpression());
 		assertEquals((float)5.2,tokenStack.top().getValue());
 		
@@ -355,7 +355,7 @@ class TokenStackTest {
 			tokenStack.pushUnformatedExpression(true);//formats to [-3]
 			assertEquals(1,tokenStack.size());
 			tokenStack=new TokenStack();
-			tokenStack.setExpression("-pow");
+			tokenStack.setExpression("-sin");
 			tokenStack.pushUnformatedExpression(true);
 			assertEquals(3,tokenStack.size());
 			tokenStack=new TokenStack();
@@ -386,10 +386,9 @@ class TokenStackTest {
 			}
 	}
 	/**
-	 * this test adds Brackets the right of a comma up to the function it represents in a Standard expression,<br>
-	 * this allows for easy solution for the shunting algorithm to work properly.<br>
-	 * 5*pow(3+2,2) evaluates to: 5*pow((3+2)2)
-	 * or: pow(pow 3+2,2,2)  evaluates to: pow((pow(3+2)2)2)
+	 * This test is to push a bracket after every function and before every comma if it is an unformated standard expression.<br>
+	 * i.e.: pow(5+2,2) will result to: pow((5+2)2) when pushed as tokens.<br>
+	 * sin(4) will result as sin(4) nothing will be pushed as function takes one operator and no commas.
 	 */
 	@Test
 	void addBracketsAroundStandardExpressionIfCommaPushed() {

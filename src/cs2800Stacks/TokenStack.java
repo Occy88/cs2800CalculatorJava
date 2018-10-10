@@ -271,48 +271,19 @@ public class TokenStack {
 		if (isStandardEquation) {
 			this.reducePlusMinusSigns();
 		}
-		
+
 		while (!this.expression.equals("")) {
-			int numberOfCommas = 0;
+
 			if (this.expression.substring(0, 1).equals(",")) {
-				// when you get to a comma:
 				if (isStandardEquation) {
 					this.pushString(")");
-					numberOfCommas++;
-					int temp = numberOfCommas;
-					Stack tempStack = new Stack();
-					while (temp > 0) {
-						try {
-							tempStack.push(this.tokenStack.pop());
-
-							if (this.tokenStack.top().getType() == Type.FUNCTION) {
-								temp--;
-							}
-							if (temp == 0) {
-								Entry entry = new Entry(Symbol.LEFT_BRACKET);
-								tempStack.push(entry);
-								;
-							}
-						} catch (EmptyStackException e) {
-							throw new InvalidExpression("wrong use of comma");
-						}
-					}
-					while (!this.isEmpty()) {
-						try {
-							tempStack.push(this.pop());
-						} catch (EmptyStackException e) {
-							e.printStackTrace();
-						}
-					}
-					this.tokenStack=tempStack;
-					this.reverseStack();
 				}
 				this.expression = this.expression.substring(1, this.expression.length());
-				this.testAndPushNextFunctionOrFloat();
+				this.testAndPushNextFunctionOrFloat(isStandardEquation);
 				continue;
 			} else if (this.testAndPushNextOperator(isStandardEquation)) {
 				continue;
-			} else if (this.testAndPushNextFunctionOrFloat()) {
+			} else if (this.testAndPushNextFunctionOrFloat(isStandardEquation)) {
 				continue;
 			} else {
 				System.out.println(this.expression);
@@ -322,65 +293,72 @@ public class TokenStack {
 		this.reverseStack();
 	}
 
-	public boolean testAndPushNextFunctionOrFloat() {
-
+	/**
+	 * this class pushes the next function or float in a string in it's longest
+	 * form, (sin < sinh) if the equation is standard and there is a function that
+	 * takes more than one operand it pushes an extra left bracket to encapsulate up
+	 * to the comma.
+	 * 
+	 * @param isStandardEquation
+	 * @return boolean pushed
+	 */
+	public boolean testAndPushNextFunctionOrFloat(boolean isStandardEquation) {
 		int index = 0;
 		String function = "";
-		// find a valid function or float
-		while (index <= this.expression.length()) {
+		String longestFunction = "";
+		for (index=0;index<= this.expression.length();index++) {
 			function = this.expression.substring(0, index);
-			// if current string is a function or float:
 			if (this.testFunction(function) || this.testFloat(function)) {
-				// if it's the longest it can be push it
-				if (function.equals(this.expression)) {
-					try {
-						this.pushString(function.substring(0, function.length()));
-						this.expression = "";
-						return true;
-					} catch (InvalidExpression e) {
-						System.out.println("Identified a valid function but couldn't push it.");
-						return false;
-					}
-				}
-				// if it can be longer keep checking validity untill it can't be longer and push
-				// it
-				while (index < this.expression.length()) {
-					index++;
-					function = this.expression.substring(0, index);
-					if (this.testFunction(function) || this.testFloat(function)) {
-						continue;
-					} else {
-						try {
-							this.pushString(function.substring(0, index - 1));
-							this.expression = (this.expression.substring(index - 1, this.expression.length()));
-							return true;
-						} catch (InvalidExpression e) {
-							System.out.println("Identified a valid function but couldn't push it: "
-									+ function.substring(0, index));
-							return false;
-						}
-					}
-				}
-			} else {
-				index++;
+				longestFunction = function;
 			}
 		}
-		return false;
+		System.out.println(expression);
+		System.out.println(longestFunction.length());
+		if (longestFunction.equals("")) {
+			return false;
+		}
+		try {
+			if (this.testFunction(longestFunction)) {
+				this.pushString(longestFunction);
+				this.expression=this.expression.substring(longestFunction.length(),this.expression.length());
+				if(Function.numberOfOperands(Function.stringToFunction(longestFunction))==2) {
+					this.pushString("(");
+				}
+				return true;
+			}
+			if(this.testFloat(longestFunction)) {
+				this.pushString(longestFunction);
+				this.expression=this.expression.substring(longestFunction.length(),this.expression.length());
+				return true;
+			}
+			return false;
+		} catch (InvalidExpression  |BadSymbolException e) {
+			System.out.println("Identified a valid function but couldn't push it.");
+			e.printStackTrace();
+			return false;
+		} 
 
 	}
 
-	public boolean testAndPushNextOperator(boolean standardEquation) {
+	/**
+	 * this function pushes the next operator, if the equation is in standard
+	 * notation, it decides when the operator acts as a sign or as an operator
+	 * depending on the previous and next elements.
+	 * 
+	 * @param isStandardEquation
+	 * @return boolean
+	 */
+	public boolean testAndPushNextOperator(boolean isStandardEquation) {
 
 		// test first character and push if it's valid
 		String firstCharacter = this.expression.substring(0, 1);
 		if (this.testSymbol(firstCharacter)) {
 			try {
-
-				if (standardEquation && (firstCharacter.equals("-") || firstCharacter.equals("+"))) {
-					// enter condition for when sign should act as operator in a standard equation
-					// when the previously push item is a bracket or a number, disregard
-					// (function(4,-2) as that will be handeled during ',' operation
+				// case for special cases where +- acts as a sign not operator.
+				if (isStandardEquation && (firstCharacter.equals("-") || firstCharacter.equals("+"))) {
+					// if before the operator there is nothing or a symbol
 					if (this.isEmpty() || this.top().getType() == Type.SYMBOL) {
+						// if there is a right bracket:
 						if (!this.isEmpty()) {
 							if (this.top().getSymbol() == Symbol.RIGHT_BRACKET) {
 								this.pushString(firstCharacter);
@@ -388,14 +366,15 @@ public class TokenStack {
 								return true;
 							}
 						}
-						//if the next item is a float with the sign, then push it, otherwise it's a function and you have to multiply it.
-						if(this.testAndPushNextFunctionOrFloat()) {
+						// if you can push a float do so:
+						if (this.testAndPushNextFunctionOrFloat(isStandardEquation)) {
 							return true;
 						}
-						//this is if the next item is a function and the previous is nothing.
+						// if the next element is a function and before it is nothing:
+						// then multiply the function by the sign:
 						else {
 							if (firstCharacter.equals("-")) {
-	
+
 								this.pushString("-1");
 								this.pushString("*");
 								this.expression = this.expression.substring(1, this.expression.length());
@@ -405,33 +384,39 @@ public class TokenStack {
 								this.pushString("*");
 								this.expression = this.expression.substring(1, this.expression.length());
 								return true;
-						}
+							}
 						}
 					}
 
 				}
+				// no special cases just push it as an operator:
 				this.pushString(firstCharacter);
 				this.expression = this.expression.substring(1, this.expression.length());
 				return true;
-			} catch (InvalidExpression | EmptyStackException e) {
+			} catch (InvalidExpression | EmptyStackException | BadTypeException e) {
 				System.out.println("Failed to push a tested Symbol character");
-				return false;
-			} catch (BadTypeException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return false;
-
 			}
 		} else {
 			return false;
 		}
 	}
 
+	/**
+	 * this function is used for testing visually, it prints strings to command
+	 * line.
+	 * 
+	 * @param string
+	 */
 	public void print(String string) {
 		// print to understand how the above works
 		System.out.println(string);
 	}
 
+	/**
+	 * this function reverses the stack
+	 */
 //Reverses the stack as this needs to be done depending on method of use.
 	public void reverseStack() {
 		Stack reverse = new Stack();
@@ -446,6 +431,10 @@ public class TokenStack {
 
 	}
 
+	/**
+	 * this function removes any duplicate or more signs in a string i.e.:
+	 * ab+-+c+-=ab-c-.
+	 */
 	public void reducePlusMinusSigns() {
 		char[] testArray = this.expression.toCharArray();
 		String resultString = "";
@@ -474,6 +463,11 @@ public class TokenStack {
 		this.expression = String.valueOf(resultString);
 	}
 
+	/**
+	 * this is a setter for the expression held in the class
+	 * 
+	 * @param string
+	 */
 	public void setExpression(String string) {
 		this.expression = string;
 		// TODO Auto-generated method stub
