@@ -271,11 +271,44 @@ public class TokenStack {
 		if (isStandardEquation) {
 			this.reducePlusMinusSigns();
 		}
-
+		
 		while (!this.expression.equals("")) {
-
+			int numberOfCommas = 0;
 			if (this.expression.substring(0, 1).equals(",")) {
+				// when you get to a comma:
+				if (isStandardEquation) {
+					this.pushString(")");
+					numberOfCommas++;
+					int temp = numberOfCommas;
+					Stack tempStack = new Stack();
+					while (temp > 0) {
+						try {
+							tempStack.push(this.tokenStack.pop());
+
+							if (this.tokenStack.top().getType() == Type.FUNCTION) {
+								temp--;
+							}
+							if (temp == 0) {
+								Entry entry = new Entry(Symbol.LEFT_BRACKET);
+								tempStack.push(entry);
+								;
+							}
+						} catch (EmptyStackException e) {
+							throw new InvalidExpression("wrong use of comma");
+						}
+					}
+					while (!this.isEmpty()) {
+						try {
+							tempStack.push(this.pop());
+						} catch (EmptyStackException e) {
+							e.printStackTrace();
+						}
+					}
+					this.tokenStack=tempStack;
+					this.reverseStack();
+				}
 				this.expression = this.expression.substring(1, this.expression.length());
+				this.testAndPushNextFunctionOrFloat();
 				continue;
 			} else if (this.testAndPushNextOperator(isStandardEquation)) {
 				continue;
@@ -342,36 +375,52 @@ public class TokenStack {
 		String firstCharacter = this.expression.substring(0, 1);
 		if (this.testSymbol(firstCharacter)) {
 			try {
-				if (standardEquation && (firstCharacter.equals("-")||firstCharacter.equals("+"))) {
-					if (this.isEmpty()) {
-						try {
-							pushString("0");
-						} catch (InvalidExpression e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					} else {
-						try {
-							if (!(this.top().getType() == Type.NUMBER)) {
-								try {
-									pushString("0");
-								} catch (InvalidExpression e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
+
+				if (standardEquation && (firstCharacter.equals("-") || firstCharacter.equals("+"))) {
+					// enter condition for when sign should act as operator in a standard equation
+					// when the previously push item is a bracket or a number, disregard
+					// (function(4,-2) as that will be handeled during ',' operation
+					if (this.isEmpty() || this.top().getType() == Type.SYMBOL) {
+						if (!this.isEmpty()) {
+							if (this.top().getSymbol() == Symbol.RIGHT_BRACKET) {
+								this.pushString(firstCharacter);
+								this.expression = this.expression.substring(1, this.expression.length());
+								return true;
 							}
-						} catch (EmptyStackException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						}
+						//if the next item is a float with the sign, then push it, otherwise it's a function and you have to multiply it.
+						if(this.testAndPushNextFunctionOrFloat()) {
+							return true;
+						}
+						//this is if the next item is a function and the previous is nothing.
+						else {
+							if (firstCharacter.equals("-")) {
+	
+								this.pushString("-1");
+								this.pushString("*");
+								this.expression = this.expression.substring(1, this.expression.length());
+								return true;
+							} else {
+								this.pushString("1");
+								this.pushString("*");
+								this.expression = this.expression.substring(1, this.expression.length());
+								return true;
+						}
 						}
 					}
+
 				}
 				this.pushString(firstCharacter);
 				this.expression = this.expression.substring(1, this.expression.length());
 				return true;
-			} catch (InvalidExpression e) {
+			} catch (InvalidExpression | EmptyStackException e) {
 				System.out.println("Failed to push a tested Symbol character");
 				return false;
+			} catch (BadTypeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+
 			}
 		} else {
 			return false;

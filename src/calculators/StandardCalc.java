@@ -27,12 +27,11 @@ public class StandardCalc {
 	*--------if the token is a function then:<br>
 	*------------push it onto the operator stack <br>
 	*--------if the token is an operator, then:<br>
-	*------------while ((there is a function at the top of the operator stack)<br>
-	*----------------or (there is an operator at the top of the operator stack with greater precedence)<br>
-	*----------------or (the operator at the top of the operator stack has equal precedence and is left associative))<br>
-	*----------------and (the operator at the top of the operator stack is not a left bracket):<br>
-	,functions with variable number of arguments, 
-	*--------------------pop operators from the operator stack onto the output queue.<br>
+	*------------while ((there is a function on the  operator stack)<br>
+	*----------------or (more important operator on the op stack )<br>
+	*----------------or (equal operator but left associative))<br>
+	*----------------and (the operator at the top of the operator stack is not a left bracket):<br>\
+	*--------------------pop j from the operator stack onto the output queue.<br>
 	*------------push it onto the operator stack.<br>
 	*--------if the token is a left bracket (i.e. "("), then:<br>
 	*------------push it onto the operator stack.<br>
@@ -116,7 +115,9 @@ public class StandardCalc {
 					e.printStackTrace();
 					throw new InvalidExpression(e.getMessage());
 			} 
+		this.outputQueue.print();
 		this.outputQueue.reverseStack();
+		this.outputQueue.print();
 		return revPolish.calculateStack(this.outputQueue);
 	}
 	public void print(String string) {

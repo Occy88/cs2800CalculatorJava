@@ -51,7 +51,9 @@ class StandardCalcTest {
 			try {
 				calc=new StandardCalc();
 //				System.out.println("Pushing expression to stack");
+				tokenStack.setExpression(expression);
 				tokenStack.pushUnformatedExpression(true);
+				tokenStack.print();
 //				System.out.println("Senting expression to Algo");
 				result = calc.shuntingAlgorithm(tokenStack);
 				sresult=Float.toString(result);

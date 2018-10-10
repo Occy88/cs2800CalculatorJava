@@ -64,7 +64,6 @@ class TokenStackTest {
 	 */
 	@Test 
 	void tokenStackPopFunction() throws EmptyStackException {
-		System.out.println("Hello");
 		TokenStack tokenStack=new TokenStack();
 		tokenStack.push(float1);
 		tokenStack.pop();
@@ -286,8 +285,8 @@ class TokenStackTest {
 		try {
 			TokenStack tokenStack=new TokenStack();
 			tokenStack.setExpression("+--5+4.2");
-			tokenStack.pushUnformatedExpression(true);//6 characters '+,-,-,5,+,4.2'
-			assertEquals(5,tokenStack.size());
+			tokenStack.pushUnformatedExpression(false);//6 characters '+,-,-,5,+,4.2'
+			assertEquals(6,tokenStack.size());
 			}catch (InvalidExpression e) {
 				System.out.println(e.getMessage());
 			}
@@ -298,21 +297,22 @@ class TokenStackTest {
 		try {
 		TokenStack tokenStack=new TokenStack();
 		tokenStack.setExpression("+3-2");
-		tokenStack.pushUnformatedExpression(true);//5 characters '+- == -' '135' 'pow' '(' '423'
-		tokenStack.print();
-		System.out.println("Size:"+tokenStack.size());
-		assertEquals(5,tokenStack.size());
+		tokenStack.pushUnformatedExpression(true);//3 characters '3' '-' '2'
+		assertEquals(3,tokenStack.size());
 		}catch (InvalidExpression e) {
 			System.out.println(e.getMessage());
 		}
 	}
+	/**
+	 * this is for postfix expressions, only as standard expressions do not accept commas randomly
+	 */
 	@Test
 	void acceptCommaAsSeparator()  {
 	
 		try {
 		TokenStack tokenStack=new TokenStack();
 		tokenStack.setExpression("+-1,3,5 Pow(4,23)");
-		tokenStack.pushUnformatedExpression(true);//10 variables (comma is just separator)
+		tokenStack.pushUnformatedExpression(false);//10 variables (comma is just separator)
 		tokenStack.print();
 		assertEquals(10,tokenStack.size());
 		}
@@ -330,31 +330,80 @@ class TokenStackTest {
 		try {
 			TokenStack tokenStack=new TokenStack();
 			tokenStack.setExpression("+++--3");
-			tokenStack.pushUnformatedExpression(false);//10 variables (comma is just separator)
+			tokenStack.pushUnformatedExpression(false);
 			assertEquals(6,tokenStack.size());
 			}
 			catch (InvalidExpression e) {
 				fail(e.getMessage());
 			}
 	}
+	/**
+	 * if there is a sign +- and before it an operator <br>
+	 * if there is a number after, push a float, <br>
+	 * if there is a function after convert the sign to [1 or -1][*]<br>
+	 * if there is the operator before is a right bracket push a float.
+	 * so: <br>
+	 * 3/-3 evaluates to: [3][/][-3]<br>
+	 * 3-pow(3,3) evaluates to: [3][/][-3]<br>
+	 * -pow(3,3) evaluates to: [-1][*][pow][3][3][)]
+	 */
 	@Test
-	void addZeroBeforeEmptyOperator() {
+	void addMultipleBeforeEmptySignOperator() {
 		try {
 			TokenStack tokenStack=new TokenStack();
-			tokenStack.setExpression("+3");
-			tokenStack.pushUnformatedExpression(true);//10 variables (comma is just separator)
+			tokenStack.setExpression("-3");
+			tokenStack.pushUnformatedExpression(true);//formats to [-3]
+			assertEquals(1,tokenStack.size());
+			tokenStack=new TokenStack();
+			tokenStack.setExpression("-pow");
+			tokenStack.pushUnformatedExpression(true);
+			assertEquals(3,tokenStack.size());
+			tokenStack=new TokenStack();
+			tokenStack.setExpression("3/-3");
+			tokenStack.pushUnformatedExpression(true);
 			assertEquals(3,tokenStack.size());
 			}
 			catch (InvalidExpression e) {
 				fail(e.getMessage());
 			}
-		
-	
 	}
-	
-		
-		
-		
+	/**
+	 * this test is a solution to the following situation that the shunting algorithm can's solve:
+	 * if there is a left Bracket followed by a sign, the sign has to be an operator not a float.<br>
+	 * this is in account that the expression has been formated so there are no sequences of signs.
+	 * so:<br> )-3 evaluates to [)][-][3];
+	 */
+	@Test
+	void pushSignOperatorBeforeLeftBracket() {
+		try {
+			TokenStack tokenStack=new TokenStack();
+			tokenStack.setExpression(")-3");
+			tokenStack.pushUnformatedExpression(true);//formats to [)][-][3]
+			assertEquals(3,tokenStack.size());
+			}
+			catch (InvalidExpression e) {
+				fail(e.getMessage());
+			}
+	}
+	/**
+	 * this test adds Brackets the right of a comma up to the function it represents in a Standard expression,<br>
+	 * this allows for easy solution for the shunting algorithm to work properly.<br>
+	 * 5*pow(3+2,2) evaluates to: 5*pow((3+2)2)
+	 * or: pow(pow 3+2,2,2)  evaluates to: pow((pow(3+2)2)2)
+	 */
+	@Test
+	void addBracketsAroundStandardExpressionIfCommaPushed() {
+		try {
+			TokenStack tokenStack=new TokenStack();
+			tokenStack.setExpression("pow(pow 3+2,2,2)");
+			tokenStack.pushUnformatedExpression(true);
+			assertEquals(13,tokenStack.size());
+			}
+			catch (InvalidExpression e) {
+				fail(e.getMessage());
+			}
+	}
+
 	
 
 }
