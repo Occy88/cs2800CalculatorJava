@@ -269,8 +269,6 @@ public class TokenStack {
 
   public void pushUnformatedExpression(boolean isStandardEquation) throws InvalidExpression {
 
-    // parse to a char array:
-
     this.removeSpaceAndCaps();
     if (isStandardEquation) {
       this.reducePlusMinusSigns();
@@ -308,38 +306,19 @@ public class TokenStack {
    * @return boolean something has been pushed
    */
   public boolean testAndPushNextFunctionOrFloat(boolean isStandardEquation) {
-    String function = "";
-    String longestFunction = "";
-    // cycle through expression untill valid argument is found
-    for (int index = 0; index <= this.expression.length(); index++) {
-      function = this.expression.substring(0, index);
-      if (this.testFunction(function) || this.testFloat(function)) {
-        longestFunction = function;
-      }
-    }
-    // if it's empty return false
-    if (longestFunction.equals("")) {
+    String longestValidString = "";
+
+    longestValidString = this.findLongestFunctionOrFloat();
+    if (longestValidString.equals("")) {
       return false;
     }
-
     try {
-      // if the longest element is a function push it
-      if (this.testFunction(longestFunction)) {
-        this.pushString(longestFunction);
-        this.expression =
-            this.expression.substring(longestFunction.length(), this.expression.length());
-        // if it is a standard equation and the function accepts two operands then push left bracket
-        if (isStandardEquation
-            && Function.numberOfOperands(Function.stringToFunction(longestFunction)) == 2) {
-          this.pushString("(");
-        }
+      if (this.testFunction(longestValidString)) {
+        this.pushLongestValidFunction(longestValidString, isStandardEquation);
         return true;
       }
-      // if it is a float instead: then push the float.
-      if (this.testFloat(longestFunction)) {
-        this.pushString(longestFunction);
-        this.expression =
-            this.expression.substring(longestFunction.length(), this.expression.length());
+      if (this.testFloat(longestValidString)) {
+        this.pushLongestValidFloat(longestValidString);
         return true;
       }
       return false;
@@ -349,6 +328,63 @@ public class TokenStack {
       return false;
     }
 
+  }
+
+  /**
+   * pushes the string representing a float at the beginning of the {@linkplain #expression},<br>
+   * then removes that string from the expression.
+   * 
+   * @param longestValidString
+   *        valid string representing a float
+   * @throws InvalidExpression
+   *         the string is not a valid float
+   */
+  private void pushLongestValidFloat(String longestValidString) throws InvalidExpression {
+    this.pushString(longestValidString);
+    this.expression =
+        this.expression.substring(longestValidString.length(), this.expression.length());
+
+  }
+
+  /**
+   * pushes the string representing a function at the beginning of the {@linkplain #expression},<br>
+   * pushes a "(" if the expression is in standard format and takes two operands, <br>
+   * then removes that string from the expression.
+   * 
+   * @param longestValidString
+   *        valid string representing a float
+   * @throws InvalidExpression
+   *         the string is not a valid float
+   */
+  private void pushLongestValidFunction(String longestValidString, boolean isStandardEquation)
+      throws InvalidExpression, BadSymbolException {
+
+    this.pushString(longestValidString);
+    this.expression =
+        this.expression.substring(longestValidString.length(), this.expression.length());
+    if (isStandardEquation
+        && Function.numberOfOperands(Function.stringToFunction(longestValidString)) == 2) {
+      this.pushString("(");
+    }
+
+  }
+
+  /**
+   * finds the longest valid string representing a function or float<br>
+   * at the beginning of the {@linkplain #expression}.
+   * 
+   * @return longestValidString a valid string a representing a function or float.
+   */
+  private String findLongestFunctionOrFloat() {
+    String currentString = "";
+    String longestValidString = "";
+    for (int index = 0; index <= this.expression.length(); index++) {
+      currentString = this.expression.substring(0, index);
+      if (this.testFunction(currentString) || this.testFloat(currentString)) {
+        longestValidString = currentString;
+      }
+    }
+    return longestValidString;
   }
 
   /**
@@ -362,15 +398,12 @@ public class TokenStack {
    */
   public boolean testAndPushNextOperator(boolean isStandardEquation) {
 
-    // test first character and push if it's valid
     String firstCharacter = this.expression.substring(0, 1);
     if (this.testSymbol(firstCharacter)) {
       try {
-        // case for special cases where +- acts as a sign not operator only with standard equations.
         if (isStandardEquation && (firstCharacter.equals("-") || firstCharacter.equals("+"))) {
-          // if before the operator there is nothing or a symbol
           if (this.isEmpty() || this.top().getType() == Type.SYMBOL) {
-            // if there is a right bracket:
+            //if right bracket before operator
             if (!this.isEmpty()) {
               if (this.top().getSymbol() == Symbol.RIGHT_BRACKET) {
                 this.pushString(firstCharacter);
@@ -378,12 +411,11 @@ public class TokenStack {
                 return true;
               }
             }
-            // if you can push a float do so:
+            //before the sign there is either nothing or an operator not a bracket
             if (this.testAndPushNextFunctionOrFloat(isStandardEquation)) {
               return true;
             } else {
-              // if the next element is a function and before it is nothing:
-              // then multiply the function by the sign:
+              // next token is a function with nothing or an operator token before it.
               if (firstCharacter.equals("-")) {
                 this.pushString("-1");
                 this.pushString("*");
@@ -433,20 +465,18 @@ public class TokenStack {
   /**
    * this function removes any duplicate or more signs in a string i.e.: ab+-+c+-=ab-c-.
    */
-  public void reducePlusMinusSigns() {
+  private void reducePlusMinusSigns() {
     char[] testArray = this.expression.toCharArray();
     String resultString = "";
     for (int i = 0; i < testArray.length; i++) {
       char input = testArray[i];
       if (input == '+' || input == '-') {
-        // if there is a next character check if it's a sign
         if (i < testArray.length - 2) {
           char nextInput = testArray[i + 1];
-          // condition met to change input to +
           if ((nextInput == '-' && input == '-') || (nextInput == '+' && input == '+')) {
             input = '+';
           } else if ((nextInput == '+' && input == '-') || (nextInput == '-' && input == '+')) {
-            input = '-'; // condition met to change input to -
+            input = '-';
           }
         }
         // continue if the next input is a sign
