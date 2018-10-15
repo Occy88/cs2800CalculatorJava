@@ -20,7 +20,8 @@ public class NumStack {
   /**
    * pushes an {@link Entry} using a float into the {@link #numStack}.
    * 
-   * @param number float to be pushed to stack
+   * @param number
+   *        float to be pushed to stack
    */
   public void push(float number) {
     Entry entry = new Entry(number);
@@ -31,15 +32,24 @@ public class NumStack {
    * returns and removes the top element from {@link #numStack}.
    * 
    * @return {@link Entry}
-   * @throws EmptyStackException if the stack is empty
-   * @throws BadTypeException if the entry is not a float when it should be
+   * @throws EmptyStackException
+   *         if the stack is empty
+   * @throws BadTypeException
+   *         if the entry is not a float when it should be
    */
-  public float pop() throws EmptyStackException, BadTypeException {
-    return numStack.pop().getValue();
+  public float pop() throws EmptyStackException {
+    try {
+      return numStack.pop().getValue();
+    } catch (BadTypeException e) {
+      e.printStackTrace();
+    }
+    return 0;
+   
   }
 
   /**
    * returns true if {@link #numStack} is empty.
+   * 
    * @return boolean the stack is empty
    * 
    */

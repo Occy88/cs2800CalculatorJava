@@ -36,15 +36,14 @@ public class RevPolishCalc {
     TokenStack tokenStack = new TokenStack();
     tokenStack.setExpression(string);
     tokenStack.pushUnformatedExpression(false);
-    tokenStack.print();
     return calculateStack(tokenStack);
   }
 
   /**
-   * Implementation of postfix Algorithm provide by Wikepedia,<br>
+   * Implementation of post-fix Algorithm provide by Wikepedia,<br>
    * Modified to work for functions as well<br>
    * . <br>
-   * for each token in the postfix expression:<br>
+   * for each token in the post-fix expression:<br>
    * ----if token is a function <br>
    * --------if function requires 1 operand: <br>
    * ------------operand1 ← pop from the stack <br>
@@ -102,7 +101,7 @@ public class RevPolishCalc {
       } else {
         throw new InvalidExpression("stack not empty, invalid expression: " + numStack.print());
       }
-    } catch (EmptyStackException | BadTypeException e) {
+    } catch (EmptyStackException e) {
       e.printStackTrace();
       throw new InvalidExpression("empty Expression or invalid Expression" + this.numStack.print());
     }

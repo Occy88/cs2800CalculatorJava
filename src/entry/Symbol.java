@@ -9,7 +9,7 @@ package entry;
  *
  */
 public enum Symbol {
-  LEFT_BRACKET, RIGHT_BRACKET, POWER, TIMES, DIVIDE, PLUS, MINUS, INVALID;
+  LEFT_BRACKET, RIGHT_BRACKET, TIMES, DIVIDE, PLUS, MINUS, INVALID;
 
   /**
    * function returns symbol associated with a character entered.
@@ -55,8 +55,6 @@ public enum Symbol {
         return 5;
       case LEFT_BRACKET:// not needed for reverse polish
         return 5;
-      case POWER:
-        return 4;
 
       case TIMES:
         return 3;
@@ -87,8 +85,6 @@ public enum Symbol {
    */
   public static boolean isOperator(Symbol symbol) throws BadSymbolException {
     switch (symbol) {
-      case POWER:
-        return true;
       case TIMES:
         return true;
       case DIVIDE:
@@ -108,6 +104,8 @@ public enum Symbol {
 
   }
 
+  // only if ^ operator to be added, but this is not required
+  // as function pow(a,b) is implemented instead.
   /**
    * function to return left associativity of symbol as a boolean.
    * 
@@ -119,8 +117,6 @@ public enum Symbol {
    */
   public static boolean isLeftAssociative(Symbol symbol) throws BadSymbolException {
     switch (symbol) {
-      case POWER:
-        return false;
       case TIMES:
         return true;
       case DIVIDE:

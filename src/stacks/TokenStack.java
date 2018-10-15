@@ -8,19 +8,20 @@ import entry.Entry;
 import entry.Function;
 import entry.Symbol;
 import entry.Type;
+import string.analysis.StringAnalysis;
 
 /**
- * This Class builds a {@link Stack} used in {@link RevPolishCalc},{@link StandardCalc}. <br>
- * input is taken as a {@link String} expression, accepts Math functions i.e.: pow(2,3).<br>
- * input is converted into a reversed stack for (postfix) computation).<br>
- * <br>
- * e.g.: for expression "((a+b)^c)/d"<br>
- * <br>
- * input: <br>
- * "pow &nbsp( &nbsp ( &nbsp a &nbsp + &nbsp b &nbsp ) &nbsp c &nbsp ) &nbsp / &nbsp 2 &nbsp"<br>
- * <br>
- * converts to:<br>
- * Stack Top -> [2]&nbsp [/]&nbsp[)]&nbsp[c]&nbsp[)]&nbsp e.t.c.
+ * This Class builds a {@link Stack} used in {@link RevPolishCalc},{@link StandardCalc}, <br>
+ * input is taken as a {@link String} expression,<br>
+ * accepts {@linkplain Math} functions, {@linkplain Symbol} and {@linkplain Float} inputs,<br>
+ * expression can be entered in standard or post-fix notation,<br>
+ * post-fix will be parsed and pushed as is, <br>
+ * Standard notation expressions will be formatted then pushed.<br>
+ * formatted:<br>
+ * excess signs removed, required brackets added, <br>
+ * resolving between "+-" acting as sign or operator.
+ * 
+ * 
  * 
  * @author octavio
  *
@@ -122,71 +123,6 @@ public class TokenStack {
   }
 
   /**
-   * This function splits a string by blank spaces.<br>
-   * this is no longer used.
-   * 
-   * @param testString
-   *        to split e.g. "a b c"
-   * @return String Array of substrings e.g. ["a"]["b"]["c"]
-   */
-
-  public static String[] parse(String testString) {
-    String[] resultString = testString.split(" ");
-    return resultString;
-  }
-
-  /**
-   * tests if a given string is a float <br>
-   * .
-   * 
-   * @param string
-   *        to test for float
-   * @return boolean is a float
-   */
-  public boolean testFloat(String string) {
-    try {
-      Float.parseFloat(string);
-      return true;
-    } catch (NumberFormatException e) {
-      return false;
-    }
-
-  }
-
-  /**
-   * tests if a given string is a {@linkplain Function}.
-   * 
-   * @param string
-   *        to test
-   * @return boolean it is a function
-   */
-  public boolean testFunction(String string) {
-    try {
-      Function.stringToFunction(string);
-      return true;
-    } catch (BadSymbolException e) {
-      return false;
-    }
-  }
-
-  /**
-   * tests if a given string is a {@linkplain Symbol} <br>
-   * .
-   * 
-   * @param string
-   *        to test
-   * @return boolean it is a symbol
-   */
-  public boolean testSymbol(String string) {
-    try {
-      Symbol.stringToSymbol(string);
-      return true;
-    } catch (BadSymbolException e) {
-      return false;
-    }
-  }
-
-  /**
    * attempt at pushing String input onto the stack. <br>
    * 
    * @param input
@@ -196,36 +132,25 @@ public class TokenStack {
    */
   public void pushString(String input) throws InvalidExpression {
 
-    if (this.testFloat(input)) {
+    if (StringAnalysis.testFloat(input)) {
       try {
         this.push(Float.parseFloat(input));
       } catch (NumberFormatException | NullPointerException e) {
         e.printStackTrace();
       }
-    } else if (this.testFunction(input)) {
+    } else if (StringAnalysis.testFunction(input)) {
       try {
         this.push(Function.stringToFunction(input));
       } catch (BadSymbolException e) {
         e.printStackTrace();
       }
-    } else if (this.testSymbol(input)) {
+    } else if (StringAnalysis.testSymbol(input)) {
       try {
         this.push(Symbol.stringToSymbol(input));
       } catch (BadSymbolException e) {
         e.printStackTrace();
       }
     }
-  }
-
-  /**
-   * tests validity of string as a {@linkplain Float}, {@linkplain Symbol} or {@linkplain Function}.
-   * 
-   * @param input
-   *        to be tested as a valid argument
-   * @return boolean it is or not a valid argument
-   */
-  public boolean checkValidityString(String input) {
-    return (testFloat(input) || testSymbol(input) || testFunction(input));
   }
 
   /**
@@ -240,23 +165,6 @@ public class TokenStack {
   }
 
   /**
-   * prints current entries in stack.
-   * 
-   */
-  public void print() {
-    this.tokenStack.print();
-
-  }
-
-  /**
-   * formats {@linkplain TokenStack#expression} string to lower case and no spaces.
-   */
-  public void removeSpaceAndCaps() {
-    this.expression = this.expression.toLowerCase();
-    this.expression = this.expression.replaceAll(" ", "");
-  }
-
-  /**
    * function to push an unformatted expression, depending on post-fix or standard notation.<br>
    * if post-fix follow post-fix rules in test cases. <br>
    * if standardNotation then follow standard rules in test cases.
@@ -266,12 +174,11 @@ public class TokenStack {
    * @throws InvalidExpression
    *         there are character elements that are invalid
    */
-
   public void pushUnformatedExpression(boolean isStandardEquation) throws InvalidExpression {
 
-    this.removeSpaceAndCaps();
+    this.expression = StringAnalysis.removeSpaceAndCaps(this.expression);
     if (isStandardEquation) {
-      this.reducePlusMinusSigns();
+      this.expression = StringAnalysis.reducePlusMinusSigns(this.expression);
     }
 
     while (!this.expression.equals("")) {
@@ -288,7 +195,6 @@ public class TokenStack {
       } else if (this.testAndPushNextFunctionOrFloat(isStandardEquation)) {
         continue;
       } else {
-        System.out.println(this.expression);
         throw new InvalidExpression(
             "expression entered has stopped processing here: " + this.expression);
       }
@@ -297,9 +203,10 @@ public class TokenStack {
   }
 
   /**
-   * this class pushes the next function or float in a string in it's longest form, <br>
-   * (sin < sinh), also if the equation is in standard format and there is a function <br>
-   * that takes more than one operand it pushes an extra left bracket .
+   * {@linkplain #testAndPushNextFunctionOrFloat(boolean)} pushes the next function or float<br>
+   * as a string in it's longest form i.e.: (sin < sinh) so sinh is pushed,<br>
+   * also if the equation is in standard format and there is a function <br>
+   * that takes more than one operand it pushes an extra left bracket.
    * 
    * @param isStandardEquation
    *        is the equation in standard format
@@ -308,16 +215,16 @@ public class TokenStack {
   public boolean testAndPushNextFunctionOrFloat(boolean isStandardEquation) {
     String longestValidString = "";
 
-    longestValidString = this.findLongestFunctionOrFloat();
+    longestValidString = StringAnalysis.findLongestFunctionOrFloat(this.expression);
     if (longestValidString.equals("")) {
       return false;
     }
     try {
-      if (this.testFunction(longestValidString)) {
+      if (StringAnalysis.testFunction(longestValidString)) {
         this.pushLongestValidFunction(longestValidString, isStandardEquation);
         return true;
       }
-      if (this.testFloat(longestValidString)) {
+      if (StringAnalysis.testFloat(longestValidString)) {
         this.pushLongestValidFloat(longestValidString);
         return true;
       }
@@ -339,7 +246,7 @@ public class TokenStack {
    * @throws InvalidExpression
    *         the string is not a valid float
    */
-  private void pushLongestValidFloat(String longestValidString) throws InvalidExpression {
+  public void pushLongestValidFloat(String longestValidString) throws InvalidExpression {
     this.pushString(longestValidString);
     this.expression =
         this.expression.substring(longestValidString.length(), this.expression.length());
@@ -356,7 +263,7 @@ public class TokenStack {
    * @throws InvalidExpression
    *         the string is not a valid float
    */
-  private void pushLongestValidFunction(String longestValidString, boolean isStandardEquation)
+  public void pushLongestValidFunction(String longestValidString, boolean isStandardEquation)
       throws InvalidExpression, BadSymbolException {
 
     this.pushString(longestValidString);
@@ -367,24 +274,6 @@ public class TokenStack {
       this.pushString("(");
     }
 
-  }
-
-  /**
-   * finds the longest valid string representing a function or float<br>
-   * at the beginning of the {@linkplain #expression}.
-   * 
-   * @return longestValidString a valid string a representing a function or float.
-   */
-  private String findLongestFunctionOrFloat() {
-    String currentString = "";
-    String longestValidString = "";
-    for (int index = 0; index <= this.expression.length(); index++) {
-      currentString = this.expression.substring(0, index);
-      if (this.testFunction(currentString) || this.testFloat(currentString)) {
-        longestValidString = currentString;
-      }
-    }
-    return longestValidString;
   }
 
   /**
@@ -399,11 +288,11 @@ public class TokenStack {
   public boolean testAndPushNextOperator(boolean isStandardEquation) {
 
     String firstCharacter = this.expression.substring(0, 1);
-    if (this.testSymbol(firstCharacter)) {
+    if (StringAnalysis.testSymbol(firstCharacter)) {
       try {
         if (isStandardEquation && (firstCharacter.equals("-") || firstCharacter.equals("+"))) {
           if (this.isEmpty() || this.top().getType() == Type.SYMBOL) {
-            //if right bracket before operator
+            // if right bracket before operator
             if (!this.isEmpty()) {
               if (this.top().getSymbol() == Symbol.RIGHT_BRACKET) {
                 this.pushString(firstCharacter);
@@ -411,7 +300,7 @@ public class TokenStack {
                 return true;
               }
             }
-            //before the sign there is either nothing or an operator not a bracket
+            // before the sign there is either nothing or an operator not a bracket
             if (this.testAndPushNextFunctionOrFloat(isStandardEquation)) {
               return true;
             } else {
@@ -448,7 +337,6 @@ public class TokenStack {
   /**
    * this function reverses the stack.
    */
-  // Reverses the stack as this needs to be done depending on method of use.
   public void reverseStack() {
     Stack reverse = new Stack();
     while (!this.isEmpty()) {
@@ -463,33 +351,6 @@ public class TokenStack {
   }
 
   /**
-   * this function removes any duplicate or more signs in a string i.e.: ab+-+c+-=ab-c-.
-   */
-  private void reducePlusMinusSigns() {
-    char[] testArray = this.expression.toCharArray();
-    String resultString = "";
-    for (int i = 0; i < testArray.length; i++) {
-      char input = testArray[i];
-      if (input == '+' || input == '-') {
-        if (i < testArray.length - 2) {
-          char nextInput = testArray[i + 1];
-          if ((nextInput == '-' && input == '-') || (nextInput == '+' && input == '+')) {
-            input = '+';
-          } else if ((nextInput == '+' && input == '-') || (nextInput == '-' && input == '+')) {
-            input = '-';
-          }
-        }
-        // continue if the next input is a sign
-        if (i < testArray.length - 1 && (testArray[i + 1] == '-' || testArray[i + 1] == '+')) {
-          continue;
-        }
-      }
-      resultString += input;
-    }
-    this.expression = String.valueOf(resultString);
-  }
-
-  /**
    * this is a setter for the expression held in the class.
    * 
    * @param string
@@ -500,4 +361,12 @@ public class TokenStack {
 
   }
 
+  /**
+   * prints current entries in stack.
+   * 
+   */
+  public void print() {
+    this.tokenStack.print();
+
+  }
 }

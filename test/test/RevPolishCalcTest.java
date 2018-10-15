@@ -1,126 +1,144 @@
 
 package test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-
-import calculators.Calculator;
 import calculators.InvalidExpression;
 import calculators.RevPolishCalc;
-import entry.Symbol;
-import stacks.EmptyStackException;
+
+import org.junit.Before;
+import org.junit.jupiter.api.Test;
+
 import stacks.TokenStack;
 
 /**
  * This class tests the {@link RevPolishCalc} class.<br>
- * Calculates expression in postfix notation using {@linkplain Entry} tokens pushed to the {@linkplain TokenStack}containing
- * fields:(TYPE) (NUMBER, SYMBOL, FUNCTION) Tokens created from the expression are assumed to be valid given they are created
- * by the {@linkplain TokenStack} class.
+ * Calculates expression in post-fix notation using {@linkplain Entry} tokens pushed<br>
+ * to the {@linkplain TokenStack} containing fields: (TYPE) (NUMBER, SYMBOL, FUNCTION)<br>
+ * Tokens created from the expression are assumed to be valid<br>
+ * given they are created by the {@linkplain TokenStack} class.
  * 
  * @author Octavio
  * 
  */
 
 class RevPolishCalcTest {
-  private TokenStack ts = new TokenStack();
-  private RevPolishCalc calc;
-
-  @BeforeEach
-  void declareClass() {
-    ts = new TokenStack();
-    calc = new RevPolishCalc();
-  }
-
-  // /**
-  // * Test #0 test for class constructor existence.
-  // */
-  // @Test
-  // void classExists() {
-  // RevPolishCalc calculator = new RevPolishCalc();
-  //
-  // }
+  private RevPolishCalc calc = new RevPolishCalc();
 
   /**
-   * Test #1 {@linkplain RevPolishClalc} accepts a reversed {@linkplain TokenStack}
-   * 
-   * 
-   * @throws InvalidExpression
-   * @throws EmptyStackException
+   * Test #0<br>
+   * initiate class.
    */
-  @Test
-  void acceptTokenStack() {
-
-    try {
-      ts.setExpression("5,5,+");
-      ts.pushUnformatedExpression(false);
-
-    } catch (InvalidExpression e) {
-      System.out.println(e.getMessage());
-
-    }
+  @Before
+  void initiateCalc() {
+    this.calc = new RevPolishCalc();
   }
 
-  /**
-   * Test #2 This test tests for simple single operator
-   * 
-   * @throws InvalidExpression
-   * @throws EmptyStackException
-   */
   @Test
-  void testSingleOperator() {
-    float result;
-    try {
-      result = calc.calculateString("5 ,2, +");
-      assertEquals((float) 7, result, "result is incorrect from expression");
-    } catch (InvalidExpression e) {
-      fail(e.getMessage());
-    }
-
-  }
-
   /**
-   * Test #3 This test tests for simple single operator
-   * 
-   * @throws InvalidExpression
-   * @throws EmptyStackException
+   * Test #1<br>
+   * save a string, and convert it to stack.
    */
-  @Test
-  void testMultipleOperators() {
-    float result;
+  void calculateStringTest() {
     try {
-      result = calc.calculateString("6,5 ,2, +,-");
-      assertEquals((float) -1, result, "result is incorrect from expression");
+      this.calc.calculateString("5,5,+");
     } catch (InvalidExpression e) {
-      fail("should have gone throug");
+      fail("expected string to be converted to stack");
       e.printStackTrace();
     }
-
+    try {
+      this.calc.calculateString("5,5,kil");
+      fail("expected invalid string to be thrown");
+    } catch (InvalidExpression e) {
+      e.getMessage();
+    }
   }
 
   @Test
-  void testAlgorithm() {
-    float result;
+
+  /**
+   * Test #2<br>
+   * test if result is popped correctly from stack if only one variable left,<br>
+   * otherwise invalid expression.
+   */
+  void testAnswerPop() {
     try {
-      result = calc.calculateString("5 ,2, +");
-      assertEquals((float) 7, result, "result is incorrect from expression");
+      assertEquals(this.calc.calculateString("5"), (float) 5,
+          "expeted operator to be resolved with two popped operands.");
     } catch (InvalidExpression e) {
-      fail("should have gone throug");
-      // TODO Auto-generated catch block
+      fail("should have been converted and calculated");
       e.printStackTrace();
     }
+    try {
+      this.calc.calculateString("5,5");
+      fail("should have been converted then two tokens left so no answer");
 
-    // System.out.println(result);
+    } catch (InvalidExpression e) {
+      e.getMessage();
+    }
   }
 
-  /*
-   * for each token in the postfix expression: if token is an operator: operand_2 ← pop from the stack operand_1 ← pop from the
-   * stack result ← evaluate token with operand_1 and operand_2 push result back onto the stack else if token is an operand:
-   * push token onto the stack result ← pop from the stack
+  @Test
+
+  /**
+   * Test #3<br>
+   * resolving an operator function.
    */
+  void resolveOperatorTest() {
+    try {
+      assertEquals(this.calc.calculateString("5,5,+"), (float) 10,
+          "expeted operator to be resolved with two popped operands.");
+    } catch (InvalidExpression e) {
+      fail("should have been converted and calculated");
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+
+  /**
+   * Test #4<br>
+   * resolving a function with one or two variables.
+   */
+  void resolveFunctionTest() {
+    try {
+      assertEquals(this.calc.calculateString("5,2,pow"), (float) 25,
+          "expeted function to be resolved with two popped operands.");
+    } catch (InvalidExpression e) {
+      fail("should have been converted and calculated");
+      e.printStackTrace();
+    }
+    try {
+      assertEquals(this.calc.calculateString("5,sin"), (float) Math.sin(5),
+          "expeted function to be resolved with one popped operands.");
+    } catch (InvalidExpression e) {
+      fail("should have been converted and calculated");
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+
+  /**
+   * Test #5<br>
+   * Testing all functionality combined.
+   */
+  void resolveEquationTest() {
+    try {
+      assertEquals(this.calc.calculateString("5,2,pow,5,+,sin"), (float) Math.sin(30),
+          "expeted function to be resolved with two popped operands.");
+    } catch (InvalidExpression e) {
+      fail("should have been converted and calculated");
+      e.printStackTrace();
+    }
+    try {
+      assertEquals(this.calc.calculateString("5,sin"), (float) Math.sin(5),
+          "expeted function to be resolved with one popped operands.");
+    } catch (InvalidExpression e) {
+      fail("should have been converted and calculated");
+      e.printStackTrace();
+    }
+  }
 
 }

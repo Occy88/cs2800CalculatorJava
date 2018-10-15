@@ -21,6 +21,24 @@ public class StandardCalc {
   private RevPolishCalc revPolish = new RevPolishCalc();
 
   /**
+   * create a tokenQueue using {@linkplain TokenStack}, calculate the expression using
+   * {@linkplain #shuntingAlgorithm(TokenStack)}.
+   * 
+   * @param expression
+   *        as string
+   * @return float answer
+   * @throws InvalidExpression
+   *         if expression has errors
+   */
+  public Float calculateString(String expression) throws InvalidExpression {
+
+    TokenStack tokenQueue = new TokenStack();
+    tokenQueue.setExpression(expression);
+    tokenQueue.pushUnformatedExpression(true);
+    return this.shuntingAlgorithm(tokenQueue);
+  }
+
+  /**
    * implementation of Wikipedia Shunting Algorithm PseudoCode bellow for reference.<br>
    * // this implementations accepts functions given by java math library such as pow(a,b),<br>
    * but not composite functions <br>
@@ -107,16 +125,20 @@ public class StandardCalc {
         throw new InvalidExpression("missmatched parentheses");
       }
       this.outputQueue.push(this.operaterStack.pop());
-    }
+    }           
 
   }
 
   /**
    * if token is a bracket, we need to push operators between those brackets.<br>
    * then disregard brackets.
-   * @param token to be tested invalid expression entered
-   * @throws BadTypeException invalid expression entered
-   * @throws EmptyStackException invalid expression entered
+   * 
+   * @param token
+   *        to be tested invalid expression entered
+   * @throws BadTypeException
+   *         invalid expression entered
+   * @throws EmptyStackException
+   *         invalid expression entered
    */
   private void pushByBrackets(Entry token) throws BadTypeException, EmptyStackException {
     // if left bracket, push it to operator stack
@@ -135,15 +157,21 @@ public class StandardCalc {
     }
 
   }
+
   /**
    * if we token is a operator/function not a bracket, then we test <br>
    * it's precedence with operators in the op stack and push the more important token.
-   * @param token to be tested
-   * @throws EmptyStackException invalid expression entered
-   * @throws BadTypeException invalid expression entered
-   * @throws BadSymbolException invalid expression entered
+   * 
+   * @param token
+   *        to be tested
+   * @throws EmptyStackException
+   *         invalid expression entered
+   * @throws BadTypeException
+   *         invalid expression entered
+   * @throws BadSymbolException
+   *         invalid expression entered
    */
-  
+
   private void pushByPrecedence(Entry token)
       throws EmptyStackException, BadTypeException, BadSymbolException {
     // if symbol => while OPERATOR/FUNCTION on operator stack more important push item to output
@@ -164,8 +192,6 @@ public class StandardCalc {
       this.operaterStack.push(token);
     }
   }
-
-  
 
   /**
    * prints all entries held in the stack.

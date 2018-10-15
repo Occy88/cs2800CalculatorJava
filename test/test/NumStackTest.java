@@ -1,13 +1,15 @@
 
 package test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import org.junit.Before;
 
 import org.junit.jupiter.api.Test;
 
-import entry.BadTypeException;
 import stacks.EmptyStackException;
 import stacks.NumStack;
 
@@ -19,53 +21,80 @@ import stacks.NumStack;
  */
 
 class NumStackTest {
-  private float number = 5 / 6;
+  private NumStack numStack = new NumStack();
 
   /**
-   * Test #1 check {@link NumStack} existence
+   * Test #1 <br>
+   * check {@link NumStack} constructor.
    */
-  @Test
+  @Before
   void createNumStack() {
-    NumStack numStack = new NumStack();
+    this.numStack = new NumStack();
   }
 
   /**
-   * Test #2 check if {@link NumStack#push(float)} pushes entry into stack
+   * Test #2<br>
+   * check if {@link NumStack#push(float)} pushes entry into stack.
    */
   @Test
   void numStackPushFunction() {
-    NumStack numStack = new NumStack();
-    numStack.push(this.number);
+    float number = 4 / 2;
+    this.numStack.push(number);
 
   }
 
   /**
-   * Test #3 check if {@link NumStack#pop()} pops number from stack
-   * 
-   * @throws EmptyStackException
-   * @throws BadTypeException
+   * Test #3 <br>
+   * check if {@link NumStack#pop()} pops and returns number from stack.
    */
   @Test
-  void numStackPopFunction() throws EmptyStackException, BadTypeException {
-    NumStack numStack = new NumStack();
-    numStack.push(number);
-    numStack.pop();
+  void numStackPopFunction() {
+    float number = 4 / 2;
+    float number1 = 6 / 2;
+    this.numStack.push(number);
+    this.numStack.push(number1);
+    try {
+      assertEquals(this.numStack.pop(), number1, "number popped is not equal");
+      assertEquals(this.numStack.pop(), number, "number popped is not equal");
+
+    } catch (EmptyStackException e) {
+      fail("nothing pushed or popped incorrectly");
+      e.printStackTrace();
+    }
 
   }
 
   /**
-   * Test #4 check if {@link NumStack#isEmpty()} returns true if stack is empty else false<br>
-   * makes push and pop test redundant
-   * 
-   * @throws EmptyStackException
-   * @throws BadTypeException
+   * Test #4 <br>
+   * check if {@link NumStack#isEmpty()} returns true if stack is empty else false.<br>
    */
   @Test
-  void numStackIsEmpty() throws EmptyStackException, BadTypeException {
-    NumStack numStack = new NumStack();
-    numStack.push(number);
-    assertFalse(numStack.isEmpty(), "stack is empty when it shouldt be");
-    numStack.pop();
-    assertTrue(numStack.isEmpty(), "stack isn't empty when it should be");
+  void numStackIsEmpty() {
+    float number = 4 / 2;
+    this.numStack.push(number);
+    assertFalse(this.numStack.isEmpty(), "stack is empty when it shouldt be");
+    try {
+      this.numStack.pop();
+      assertTrue(this.numStack.isEmpty(), "stack isn't empty when it should be");
+    } catch (EmptyStackException e) {
+      e.printStackTrace();
+      fail("numstack should be empty after pop");
+    }
+
+  }
+
+  /**
+   * Test #5 <br>
+   * check if {@link NumStack#isEmpty()} throws .<br>
+   */
+  @Test
+  void numStackPopError() {
+    try {
+      this.numStack.pop();
+      fail("should have thrown empty stack exception error");
+    } catch (EmptyStackException e) {
+      e.getMessage();
+    }
+
   }
 }

@@ -1,6 +1,7 @@
 
 package stacks;
 
+import entry.BadTypeException;
 import entry.Entry;
 
 /**
@@ -19,7 +20,8 @@ public class StrStack {
   /**
    * pushes an {@link Entry} using a string into the {@link #strStack}.
    *
-   * @param string to be pushed
+   * @param string
+   *        to be pushed
    */
   public void push(String string) {
     Entry entry = new Entry(string);
@@ -30,10 +32,16 @@ public class StrStack {
    * returns and removes the top element from {@link #strStack}.
    * 
    * @return {@link Entry}
-   * @throws EmptyStackException if the stack is empty during request
+   * @throws EmptyStackException
+   *         if the stack is empty during request
    */
-  public Entry pop() throws EmptyStackException {
-    return strStack.pop();
+  public String pop() throws EmptyStackException {
+    try {
+      return strStack.pop().getString();
+    } catch (BadTypeException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   /**

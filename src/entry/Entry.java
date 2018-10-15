@@ -25,9 +25,15 @@ public class Entry {
    */
   private Type type;
   /**
-   * use not yet available.
+   * Function entered by the user.<br>
+   * Stored as an enum.
+   * 
    */
   private Function function = Function.INVALID;
+  /**
+   * Symbol entered by the user. <br>
+   * stored as enum.
+   */
   private Symbol symbol = Symbol.INVALID;
 
   /**
@@ -73,6 +79,13 @@ public class Entry {
     this.type = Type.SYMBOL;
   }
 
+  /**
+   * stores {@linkplain Function} into {@link #symbol}<br>
+   * declares {@linkplain Function} type for {@link #type}.
+   *
+   * @param function
+   *        to be held in the entry
+   */
   public Entry(Function function) {
     this.function = function;
     this.type = Type.FUNCTION;
@@ -86,23 +99,6 @@ public class Entry {
   public Type getType() {
     return this.type;
 
-  }
-
-  /**
-   * constructs a string representing data held by the Entry .
-   * 
-   * @return {@link #str} constructed string.
-   */
-  public String toString() {
-    String string = "";
-    if (this.symbol != Symbol.INVALID) {
-      string += this.symbol.toString();
-    } else if (this.number != (float) 0) {
-      string += Float.toString(this.number);
-    } else if (this.function != Function.INVALID) {
-      string += this.function.toString();
-    }
-    return string;
   }
 
   /**
@@ -163,5 +159,22 @@ public class Entry {
       throw new BadTypeException(Type.FUNCTION, type);
     }
     return this.function;
+  }
+
+  /**
+   * constructs a string representing data held by the Entry .
+   * 
+   * @return {@link #str} constructed string.
+   */
+  public String toString() {
+    String string = "";
+    if (this.symbol != Symbol.INVALID) {
+      string += this.symbol.toString();
+    } else if (this.number != (float) 0) {
+      string += Float.toString(this.number);
+    } else if (this.function != Function.INVALID) {
+      string += this.function.toString();
+    }
+    return string;
   }
 }
