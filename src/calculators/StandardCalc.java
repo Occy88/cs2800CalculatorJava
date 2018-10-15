@@ -125,7 +125,7 @@ public class StandardCalc {
         throw new InvalidExpression("missmatched parentheses");
       }
       this.outputQueue.push(this.operaterStack.pop());
-    }           
+    }
 
   }
 
@@ -176,16 +176,16 @@ public class StandardCalc {
       throws EmptyStackException, BadTypeException, BadSymbolException {
     // if symbol => while OPERATOR/FUNCTION on operator stack more important push item to output
     // then push symbol to operator stack.
-    if (token.getType() == Type.SYMBOL && Symbol.isOperator(token.getSymbol())) {
+    if (token.getType() == Type.SYMBOL && token.getSymbol().isOperator()) {
       while (!this.operaterStack.isEmpty() && ((this.operaterStack.top().getType() == Type.FUNCTION)
           || ((this.operaterStack.top().getType() == Type.SYMBOL
               && !(this.operaterStack.top().getSymbol() == Symbol.LEFT_BRACKET
                   || this.operaterStack.top().getSymbol() == Symbol.RIGHT_BRACKET))
-              && ((Symbol.getPrecedence(token.getSymbol()) < Symbol
-                  .getPrecedence(this.operaterStack.top().getSymbol()))
-                  || (Symbol.getPrecedence(token.getSymbol()) == Symbol
-                      .getPrecedence(this.operaterStack.top().getSymbol())
-                      && Symbol.isLeftAssociative(this.operaterStack.top().getSymbol())))))
+              && (token.getSymbol().getPrecedence() < this.operaterStack.top().getSymbol()
+                  .getPrecedence()
+                  || (token.getSymbol().getPrecedence() == this.operaterStack.top().getSymbol()
+                      .getPrecedence()
+                      && this.operaterStack.top().getSymbol().isLeftAssociative()))))
       ) {
         this.outputQueue.push(this.operaterStack.pop());
       }

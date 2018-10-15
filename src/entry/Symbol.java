@@ -9,7 +9,62 @@ package entry;
  *
  */
 public enum Symbol {
-  LEFT_BRACKET, RIGHT_BRACKET, TIMES, DIVIDE, PLUS, MINUS, INVALID;
+  LEFT_BRACKET(5, false, true),
+  RIGHT_BRACKET(5, false, true),
+  TIMES(3, true, true),
+  DIVIDE(3, true, true),
+  PLUS(2, true, true),
+  MINUS(2, true, true),
+  INVALID(1, false, false);
+  private int precedence = 0;
+  private boolean isOperator = false;
+  private boolean isLeftAssociative = false;
+
+  /**
+   * constructor for available enums,<br>
+   * isLeftAssociative only matters for implementation of more signs,<br>
+   * isOperator defines if enum acts as operator and,<br>
+   * precedence defines order of computation.<br>
+   * 
+   * @param precedence
+   *        order of computation
+   * @param isOperator
+   *        if it's an operator
+   * @param isLeftAssociative
+   *        if it should be pushed in case same precedence.
+   */
+  Symbol(int precedence, boolean isOperator, boolean isLeftAssociative) {
+    this.precedence = precedence;
+    this.isOperator = isOperator;
+    this.isLeftAssociative = isLeftAssociative;
+  }
+
+  /**
+   * getter for {@linkplain #precedence}.
+   * 
+   * @return int precedence
+   */
+  public int getPrecedence() {
+    return this.precedence;
+  }
+
+  /**
+   * getter for {@linkplain #isLeftAssociative}.
+   * 
+   * @return boolean left associative
+   */
+  public boolean isLeftAssociative() {
+    return this.isLeftAssociative;
+  }
+
+  /**
+   * getter for {@linkplain #isOperator}.
+   * 
+   * @return boolean isOperator
+   */
+  public boolean isOperator() {
+    return this.isOperator;
+  }
 
   /**
    * function returns symbol associated with a character entered.
@@ -38,97 +93,5 @@ public enum Symbol {
         throw new BadSymbolException(string);
 
     }
-  }
-
-  /**
-   * this function returns the precedence of available symbols.
-   * 
-   * @param symbol
-   *        to test
-   * @return the precedence of the symbol
-   * @throws BadSymbolException
-   *         the parameter entered is not a symbol
-   */
-  public static int getPrecedence(Symbol symbol) throws BadSymbolException {
-    switch (symbol) {
-      case RIGHT_BRACKET:// not needed for reverse polish
-        return 5;
-      case LEFT_BRACKET:// not needed for reverse polish
-        return 5;
-
-      case TIMES:
-        return 3;
-
-      case DIVIDE:
-        return 3;
-
-      case PLUS:
-        return 2;
-
-      case MINUS:
-        return 2;
-      default:
-        throw new BadSymbolException(symbol.toString());
-
-    }
-
-  }
-
-  /**
-   * function to check if a symbol is an operator as '(' and ')' are not.
-   * 
-   * @param symbol
-   *        the symbol to test
-   * @return boolean symbol is an operator
-   * @throws BadSymbolException
-   *         the symbol sent is not a symbol
-   */
-  public static boolean isOperator(Symbol symbol) throws BadSymbolException {
-    switch (symbol) {
-      case TIMES:
-        return true;
-      case DIVIDE:
-        return true;
-      case PLUS:
-        return true;
-      case MINUS:
-        return true;
-      case LEFT_BRACKET:
-        return false;
-      case RIGHT_BRACKET:
-        return false;
-      default:
-        throw new BadSymbolException(symbol.toString());
-
-    }
-
-  }
-
-  // only if ^ operator to be added, but this is not required
-  // as function pow(a,b) is implemented instead.
-  /**
-   * function to return left associativity of symbol as a boolean.
-   * 
-   * @param symbol
-   *        to test
-   * @return boolean is the symbol left associative
-   * @throws BadSymbolException
-   *         symbol tested is not a symbol
-   */
-  public static boolean isLeftAssociative(Symbol symbol) throws BadSymbolException {
-    switch (symbol) {
-      case TIMES:
-        return true;
-      case DIVIDE:
-        return true;
-      case PLUS:
-        return true;
-      case MINUS:
-        return true;
-      default:
-        throw new BadSymbolException(symbol.toString());
-
-    }
-
   }
 }

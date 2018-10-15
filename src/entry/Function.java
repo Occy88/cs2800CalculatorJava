@@ -10,36 +10,51 @@ package entry;
  */
 public enum Function {
 
-  SIN,
-  COS,
-  TAN,
-  ASIN,
-  ACOS,
-  ATAN,
-  ATAN2,
-  COSH,
-  SINH,
-  TANH,
-  LOG,
-  LOG10,
-  LOG1P,
-  EXP,
-  EXPM1,
-  CBRT,
-  SQRT,
-  HYPOT,
-  SIGNUM,
-  ULP,
-  ABS,
-  CEIL,
-  FLOOR,
-  IEEEREMAINDER,
-  POW,
-  RINT,
-  ROUND,
-  TODEGREES,
-  TORADIANS,
-  INVALID;
+  SIN(1),
+  COS(1),
+  TAN(1),
+  ASIN(1),
+  ACOS(1),
+  ATAN(1),
+  ATAN2(2),
+  COSH(1),
+  SINH(1),
+  TANH(1),
+  LOG(1),
+  LOG10(1),
+  LOG1P(1),
+  EXP(1),
+  EXPM1(1),
+  CBRT(1),
+  SQRT(1),
+  HYPOT(2),
+  SIGNUM(1),
+  ULP(1),
+  ABS(1),
+  CEIL(1),
+  FLOOR(1),
+  IEEEREMAINDER(2),
+  POW(2),
+  RINT(1),
+  ROUND(1),
+  TODEGREES(1),
+  TORADIANS(1),
+  INVALID(1);
+  private int numberOfOperands = 0;
+
+  Function(int numberOfOperands) {
+    this.numberOfOperands = numberOfOperands;
+  }
+
+  /**
+   * returns number of operands function takes.
+   * 
+   * @return int number of operands
+   */
+  public int getNumberOfOperands() {
+    return this.numberOfOperands;
+  }
+
   /**
    * returns the function that is associated with the input string.
    * 
@@ -49,6 +64,7 @@ public enum Function {
    * @throws BadSymbolException
    *         the input string is not a function
    */
+
   public static Function stringToFunction(String string) throws BadSymbolException {
     switch (string) {
       case "sin":
@@ -111,74 +127,6 @@ public enum Function {
         return Function.TORADIANS;
       default:
         throw new BadSymbolException(string);
-
-    }
-  }
-
-  /**
-   * returns the number of operands a given function takes.
-   * 
-   * @param function
-   *        to test
-   * @return integer number of operands
-   * @throws BadSymbolException
-   *         the function tested is not a function
-   */
-
-  public static int numberOfOperands(Function function) throws BadSymbolException {
-    switch (function) {
-      case SIN:
-        return 1;
-      case COS:
-        return 1;
-      case TAN:
-        return 1;
-      case ASIN:
-        return 1;
-      case ACOS:
-        return 1;
-      case ATAN:
-        return 1;
-      case ATAN2:
-        return 2;
-      case COSH:
-        return 1;
-      case SINH:
-        return 1;
-      case TANH:
-        return 1;
-      case LOG:
-        return 1;
-      case LOG10:
-        return 1;
-      case LOG1P:
-        return 1;
-      case EXP:
-        return 1;
-      case EXPM1:
-        return 1;
-      case CBRT:
-        return 1;
-      case SQRT:
-        return 1;
-      case HYPOT:
-        return 2;
-      case SIGNUM:
-        return 1;
-      case ULP:
-        return 1;
-      case ABS:
-        return 1;
-      case CEIL:
-        return 1;
-      case FLOOR:
-        return 1;
-      case IEEEREMAINDER:
-        return 2;
-      case POW:
-        return 2;
-      default:
-        throw new BadSymbolException(function.toString());
 
     }
   }

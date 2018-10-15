@@ -270,7 +270,7 @@ public class TokenStack {
     this.expression =
         this.expression.substring(longestValidString.length(), this.expression.length());
     if (isStandardEquation
-        && Function.numberOfOperands(Function.stringToFunction(longestValidString)) == 2) {
+        && Function.stringToFunction(longestValidString).getNumberOfOperands() == 2) {
       this.pushString("(");
     }
 

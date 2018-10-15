@@ -4,8 +4,6 @@ package calculators;
 import entry.BadSymbolException;
 import entry.BadTypeException;
 import entry.Entry;
-import entry.Function;
-import entry.Symbol;
 import entry.Type;
 import stacks.EmptyStackException;
 import stacks.NumStack;
@@ -77,7 +75,7 @@ public class RevPolishCalc {
         if (token.getType() == Type.FUNCTION) {
           this.resolveFunction(token);
 
-        } else if ((token.getType() == Type.SYMBOL) && Symbol.isOperator(token.getSymbol())) {
+        } else if ((token.getType() == Type.SYMBOL) && token.getSymbol().isOperator()) {
           this.resolveOperator(token);
 
         } else if (token.getType() == Type.NUMBER) {
@@ -149,7 +147,7 @@ public class RevPolishCalc {
     float operand1;
     float operand2;
     float result;
-    int numberOfOperands = Function.numberOfOperands(token.getFunction());
+    int numberOfOperands = token.getFunction().getNumberOfOperands();
     // depending on number of operands function takes, pop that number
     // calculate the result then push it.
 
@@ -179,7 +177,6 @@ public class RevPolishCalc {
   public void printAll() {
     System.out.println("NUM STACK: ");
     this.numStack.print();
-    // TODO Auto-generated method stub
 
   }
 
